@@ -59,6 +59,21 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString()+APP_NAME_UA);
         //mz_tbs_webview.getSettings().setUserAgentString(APP_NAME_UA);
         mz_button.setOnClickListener(this);
+        mz_url = mz_edittext.getText().toString();
+        mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
+        mz_tbs_webview.loadUrl(mz_url);
+        mz_tbs_webview.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webView, String s) {
+                return super.shouldOverrideUrlLoading(webView, s);
+            }
+
+            @Override
+            public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
+                super.onPageStarted(webView, s, bitmap);
+                mz_edittext.setText(mz_tbs_webview.getUrl());
+            }
+        });
     }
 
     @Override
@@ -71,20 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             if (!(mz_url.startsWith("http://")||mz_url.startsWith("https://"))){
                 mz_url = "http://" + mz_url;
             }
-            mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
             mz_tbs_webview.loadUrl(mz_url);
-            mz_tbs_webview.setWebViewClient(new WebViewClient(){
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView webView, String s) {
-                    return super.shouldOverrideUrlLoading(webView, s);
-                }
-
-                @Override
-                public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
-                    super.onPageStarted(webView, s, bitmap);
-                    mz_edittext.setText(mz_tbs_webview.getUrl());
-                }
-            });
         }
     }
 
