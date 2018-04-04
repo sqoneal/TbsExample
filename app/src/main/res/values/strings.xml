@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">TbsExample</string>
-    <string name="index_site">http://www.baidu.com</string>
+    <string name="index_site">http://v.qq.com</string>
     <string name="clickgo">GO</string>
 </resources>
