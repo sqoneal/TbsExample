@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             }
             mz_tbs_webview.loadUrl(mz_url);
         }else if(v == mz_tbs_webview){
-            mz_llayout1.setTop(0);
-            mz_llayout1.setBottom(48);
+            mz_llayout1.setTop(mz_llayout1place[0]);
+            mz_llayout1.setBottom(mz_llayout1place[1]);
         }
     }
 
