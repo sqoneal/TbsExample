@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initview();
+        Log.e("top",mz_llayout1.getTop()+"");
+        Log.e("Bottom",mz_llayout1.getBottom()+"");
     }
 
     @Override
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
         mz_tbs_webview.setOnClickListener(this);
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);
-        mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom()};
+
         mz_url = mz_edittext.getText().toString();
         mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
         mz_tbs_webview.loadUrl(mz_url);
@@ -87,18 +89,25 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             public void onPageFinished(WebView webView, String s) {
                 super.onPageFinished(webView, s);
                 mz_edittext.setText(mz_tbs_webview.getUrl());
-                mz_llayout1.setTop(0);
-                mz_llayout1.setBottom(48);
+                Log.e("ftop",mz_llayout1.getTop()+"");
+                Log.e("fBottom",mz_llayout1.getBottom()+"");
+                if (mz_llayout1place == null){
+                    mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom()};
+                }
+                mz_llayout1.setTop(mz_llayout1place[0]);
+                mz_llayout1.setBottom(mz_llayout1place[1]);
             }
         });
         mz_tbs_webview.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                Log.e("stop",mz_llayout1.getTop()+"");
+                Log.e("sBottom",mz_llayout1.getBottom()+"");
                 if (scrollY > oldScrollY) {
                     //mz_llayout1.setVisibility(View.INVISIBLE);
                     int scroll_diff = scrollY - oldScrollY;
-                    if (mz_llayout1.getBottom() < 0) {
-                        mz_llayout1.setTop(-48);
+                    if (mz_llayout1.getBottom() - scroll_diff < 0) {
+                        mz_llayout1.setTop(-mz_llayout1place[1]);
                         mz_llayout1.setBottom(0);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() - scroll_diff);
@@ -108,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 if (scrollY < oldScrollY) {
                     //mz_llayout1.setVisibility(View.VISIBLE);
                     int scroll_diff = oldScrollY - scrollY;
-                    if (mz_llayout1.getTop() > 0) {
+                    if (mz_llayout1.getTop() + scroll_diff > 0) {
                         mz_llayout1.setTop(0);
-                        mz_llayout1.setBottom(48);
+                        mz_llayout1.setBottom(mz_llayout1place[1]);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() + scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() + scroll_diff);
