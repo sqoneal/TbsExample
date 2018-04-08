@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     Button mz_button;
     String mz_url;
     LinearLayout mz_llayout1;
-    int mz_llayout1padding[];
+    int mz_llayout1place[];
 
     Handler mz_handler = new Handler() {
         @Override
@@ -61,15 +61,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     public void initview() {
         mz_button = (Button) this.findViewById(R.id.mzButton);
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);
-        mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
         mz_button.setOnClickListener(this);
 
         mz_llayout1 = (LinearLayout) this.findViewById(R.id.llayout1);
 
+        mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
+        mz_tbs_webview.setOnClickListener(this);
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);
-        //mz_tbs_webview.getSettings().setUserAgentString(APP_NAME_UA);
-        mz_llayout1padding = new int[]{mz_llayout1.getPaddingLeft(), mz_llayout1.getPaddingTop(),
-                mz_llayout1.getPaddingRight(), mz_llayout1.getPaddingBottom()};
+        mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom()};
         mz_url = mz_edittext.getText().toString();
         mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
         mz_tbs_webview.loadUrl(mz_url);
@@ -82,33 +81,40 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             @Override
             public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
                 super.onPageStarted(webView, s, bitmap);
+            }
+
+            @Override
+            public void onPageFinished(WebView webView, String s) {
+                super.onPageFinished(webView, s);
                 mz_edittext.setText(mz_tbs_webview.getUrl());
-                mz_llayout1.setPadding(mz_llayout1padding[0], mz_llayout1padding[1]
-                        , mz_llayout1padding[2], mz_llayout1padding[3]);
+                mz_llayout1.setTop(0);
+                mz_llayout1.setBottom(48);
             }
         });
         mz_tbs_webview.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (scrollY > oldScrollY) {
-                    mz_llayout1.setVisibility(View.INVISIBLE);
-                   /* mz_llayout1.setPadding(mz_llayout1.getPaddingLeft(), mz_llayout1.getPaddingTop() - scrollY + oldScrollY
-                            , mz_llayout1.getPaddingRight(), mz_llayout1.getPaddingBottom() - scrollY + oldScrollY);
-                    if (mz_llayout1.getPaddingTop() > -100) {
-                        mz_llayout1.setVisibility(View.INVISIBLE);
-                        mz_llayout1.setPadding(mz_llayout1padding[0], mz_llayout1padding[1]
-                                , mz_llayout1padding[2], mz_llayout1padding[3]);
-                    }*/
-
+                    //mz_llayout1.setVisibility(View.INVISIBLE);
+                    int scroll_diff = scrollY - oldScrollY;
+                    if (mz_llayout1.getBottom() < 0) {
+                        mz_llayout1.setTop(-48);
+                        mz_llayout1.setBottom(0);
+                    } else {
+                        mz_llayout1.setTop(mz_llayout1.getTop() - scroll_diff);
+                        mz_llayout1.setBottom(mz_llayout1.getBottom() - scroll_diff);
+                    }
                 }
                 if (scrollY < oldScrollY) {
-                    mz_llayout1.setVisibility(View.VISIBLE);
-                    /*mz_llayout1.setPadding(mz_llayout1.getPaddingLeft(), mz_llayout1.getPaddingTop() + oldScrollY - scrollY
-                            , mz_llayout1.getPaddingRight(), mz_llayout1.getPaddingBottom() + oldScrollY - scrollY);
-                    if (mz_llayout1.getPaddingTop() < 100) {
-                        mz_llayout1.setPadding(mz_llayout1padding[0], mz_llayout1padding[1]
-                                , mz_llayout1padding[2], mz_llayout1padding[3]);
-                    }*/
+                    //mz_llayout1.setVisibility(View.VISIBLE);
+                    int scroll_diff = oldScrollY - scrollY;
+                    if (mz_llayout1.getTop() > 0) {
+                        mz_llayout1.setTop(0);
+                        mz_llayout1.setBottom(48);
+                    } else {
+                        mz_llayout1.setTop(mz_llayout1.getTop() + scroll_diff);
+                        mz_llayout1.setBottom(mz_llayout1.getBottom() + scroll_diff);
+                    }
                 }
             }
         });
@@ -125,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 mz_url = "http://" + mz_url;
             }
             mz_tbs_webview.loadUrl(mz_url);
+        }else if(v == mz_tbs_webview){
+            mz_llayout1.setTop(0);
+            mz_llayout1.setBottom(48);
         }
     }
 
