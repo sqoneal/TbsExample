@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_gravity="top|left"
     tools:context="com.liebao.zzj.tbsexample.MainActivity">
+
+    <FrameLayout
+        android:focusable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.tencent.smtt.sdk.WebView
+            android:id="@+id/mzTSBWebView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/llayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/viewbackground"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <EditText
@@ -23,19 +37,18 @@
             android:inputType="text"
             android:lines="1"/>
 
-        <Button
+<!--        <Button
             android:id="@+id/mzButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/clickgo"/>
+            android:text="@string/clickgo"/>-->
+
+        <ImageView
+            android:id="@+id/mzImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/refresh"
+            />
     </LinearLayout>
-
-
-    <com.tencent.smtt.sdk.WebView
-        android:id="@+id/mzTSBWebView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp" />
-</LinearLayout>
+</FrameLayout>
