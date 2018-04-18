@@ -71,13 +71,13 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);
         mz_pb = (ProgressBar) this.findViewById(R.id.mzprogressBar1);
         mz_imageview.setOnClickListener(this);
+        mz_edittext.setOnClickListener(this);
         mz_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
         mz_animation.setRepeatMode(Animation.RESTART);
 
         mz_llayout1 = (LinearLayout) this.findViewById(R.id.llayout1);
 
         mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
-        mz_tbs_webview.setOnClickListener(this);
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);
 
         mz_url = mz_edittext.getText().toString();
@@ -95,6 +95,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     mz_pb.setProgress(i);//设置进度值
                 }
             }
+
             @Override
             public boolean onJsAlert(WebView webView, String s, String s1, JsResult jsResult) {
                 return super.onJsAlert(webView, s, s1, jsResult);
@@ -200,9 +201,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 mz_url = "http://" + mz_url;
             }
             mz_tbs_webview.loadUrl(mz_url);
-        } else if (v == mz_tbs_webview) {
-            mz_llayout1.setTop(mz_llayout1place[0]);
-            mz_llayout1.setBottom(mz_llayout1place[1]);
+        } else if (v == mz_edittext) {
+            mz_edittext.setSelection(0, mz_edittext.getText().length());
         }
     }
 
