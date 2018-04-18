@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.JsResult;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity implements OnClickListener {
     LinearLayout mz_llayout1;
     int mz_llayout1place[];
     Animation mz_animation = null;
+    ProgressBar mz_pb;
 
     Handler mz_handler = new Handler() {
         @Override
@@ -65,10 +67,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @TargetApi(Build.VERSION_CODES.M)
     public void initview() {
-        //mz_button = (Button) this.findViewById(R.id.mzButton);
         mz_imageview = (ImageView) this.findViewById(R.id.mzImageView);
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);
-        //mz_button.setOnClickListener(this);
+        mz_pb = (ProgressBar) this.findViewById(R.id.mzprogressBar1);
         mz_imageview.setOnClickListener(this);
         mz_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
         mz_animation.setRepeatMode(Animation.RESTART);
@@ -84,6 +85,16 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_tbs_webview.loadUrl(mz_url);
 
         mz_tbs_webview.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView webView, int i) {
+                super.onProgressChanged(webView, i);
+                if (i == 100) {
+                    mz_pb.setVisibility(View.GONE);//加载完网页进度条消失
+                } else {
+                    mz_pb.setVisibility(View.VISIBLE);//开始加载网页时显示进度条
+                    mz_pb.setProgress(i);//设置进度值
+                }
+            }
             @Override
             public boolean onJsAlert(WebView webView, String s, String s1, JsResult jsResult) {
                 return super.onJsAlert(webView, s, s1, jsResult);

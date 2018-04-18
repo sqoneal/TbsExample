@@ -7,9 +7,10 @@
     tools:context="com.liebao.zzj.tbsexample.MainActivity">
 
     <FrameLayout
-        android:focusable="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:focusable="true">
+
         <com.tencent.smtt.sdk.WebView
             android:id="@+id/mzTSBWebView"
             android:layout_width="fill_parent"
@@ -22,33 +23,41 @@
         android:id="@+id/llayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/viewbackground"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/mzEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text="@string/index_site"
-            android:layout_weight="1"
-            android:inputType="text"
-            android:lines="1"/>
+            android:background="@color/viewbackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-<!--        <Button
-            android:id="@+id/mzButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/clickgo"/>-->
+            <EditText
+                android:id="@+id/mzEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="@string/index_site" />
 
-        <ImageView
-            android:id="@+id/mzImageView"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/refresh"
-            />
+            <ImageView
+                android:id="@+id/mzImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/refresh" />
+
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/mzprogressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dip"
+            android:progressDrawable="@drawable/pg"
+            android:visibility="gone" />
     </LinearLayout>
 </FrameLayout>
