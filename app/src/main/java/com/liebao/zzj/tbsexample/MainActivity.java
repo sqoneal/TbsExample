@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
+import com.tencent.smtt.export.external.interfaces.JsResult;
+import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
@@ -79,6 +82,18 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_url = mz_edittext.getText().toString();
         mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
         mz_tbs_webview.loadUrl(mz_url);
+
+        mz_tbs_webview.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView webView, String s, String s1, JsResult jsResult) {
+                return super.onJsAlert(webView, s, s1, jsResult);
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                return super.onConsoleMessage(consoleMessage);
+            }
+        });
         mz_tbs_webview.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, String s) {
@@ -94,6 +109,7 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onPageFinished(WebView webView, String s) {
                 super.onPageFinished(webView, s);
+
                 mz_edittext.setText(mz_tbs_webview.getUrl());
                 if (mz_llayout1place == null) {
                     mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom()};
@@ -101,10 +117,12 @@ public class MainActivity extends Activity implements OnClickListener {
                 mz_llayout1.setTop(mz_llayout1place[0]);
                 mz_llayout1.setBottom(mz_llayout1place[1]);
 
-                mz_tbs_webview.setTop(mz_llayout1place[1]);
+                addJsinfobar(mz_llayout1place[1]);
+                //mz_tbs_webview.setTop(mz_llayout1place[1]);
                 mz_imageview.clearAnimation();
             }
         });
+
         mz_tbs_webview.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -114,14 +132,13 @@ public class MainActivity extends Activity implements OnClickListener {
                     if (mz_llayout1.getBottom() - scroll_diff < 0) {
                         mz_llayout1.setTop(-mz_llayout1place[1]);
                         mz_llayout1.setBottom(0);
+                        //setJsinobar(0);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() - scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() - scroll_diff);
-                        if (mz_tbs_webview.getTop() > 0) {
-                            mz_tbs_webview.setTop(mz_tbs_webview.getTop() - scroll_diff);
-                            mz_tbs_webview.setBottom(mz_tbs_webview.getBottom() + scroll_diff);
-                        }
+                        //setJsinobar(mz_llayout1.getBottom() - scroll_diff);
                     }
+
                 }
                 if (scrollY < oldScrollY) {
                     //mz_llayout1.setVisibility(View.VISIBLE);
@@ -129,19 +146,37 @@ public class MainActivity extends Activity implements OnClickListener {
                     if (mz_llayout1.getTop() + scroll_diff > 0) {
                         mz_llayout1.setTop(0);
                         mz_llayout1.setBottom(mz_llayout1place[1]);
-                        if (scrollY == 0) {
-                            mz_tbs_webview.setTop(mz_llayout1place[1]);
-                        }
+                        //setJsinobar(mz_llayout1place[1]);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() + scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() + scroll_diff);
-                        mz_tbs_webview.setTop(mz_tbs_webview.getTop() + scroll_diff);
-                        mz_tbs_webview.setBottom(mz_tbs_webview.getBottom() - scroll_diff);
+                        //setJsinobar(mz_llayout1.getBottom() + scroll_diff);
                     }
                 }
             }
         });
     }
+
+    public void addJsinfobar(int height) {
+        this.mz_tbs_webview.loadUrl("javascript:" +
+                "if(document.getElementById(\"tsbexamplehide\")) \n" +
+                "{ \n" +
+                "}else{\n" +
+                "\tvar para=document.createElement(\"div\");\n" +
+                "\tpara.id = \"tsbexamplehide\";\n" +
+                "\tpara.style.height = '" + (height / 2) + "px';\n" +
+                "\tvar first=document.body.firstChild;\n" +
+                "\tdocument.body.insertBefore(para,first);\n" +
+                "}");
+        //this.mz_llayout1.setVisibility(View.GONE);
+    }
+
+   /* public void setJsinobar(int height) {
+        Log.e("test", "" + height + "   " + mz_llayout1.getBottom());
+
+        *//*this.mz_tbs_webview.loadUrl("javascript:" +
+                "document.getElementById(\"tsbexamplehide\").style.height = '" + (height / 2) + "';");*//*
+    }*/
 
     @Override
     public void onClick(View v) {
