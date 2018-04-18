@@ -164,7 +164,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 "}else{\n" +
                 "\tvar para=document.createElement(\"div\");\n" +
                 "\tpara.id = \"tsbexamplehide\";\n" +
-                "\tpara.style.height = '" + (height / 2) + "px';\n" +
+                "\tpara.style.height = '" + (height / 2.7) + "px';\n" +
                 "\tvar first=document.body.firstChild;\n" +
                 "\tdocument.body.insertBefore(para,first);\n" +
                 "}");
