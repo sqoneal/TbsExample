@@ -13,15 +13,30 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+        }
+        debug {
+            jniDebuggable false
+            renderscriptDebuggable false
+            minifyEnabled false
+            debuggable false
         }
     }
-    sourceSets { main { res.srcDirs = ['src/main/res', 'src/main/res/anim'] } }
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res', 'src/main/res/anim']
+            jniLibs.srcDirs = ['jniLibs']
+        }
+    }
+
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile files('libs/tbs_sdk.jar')

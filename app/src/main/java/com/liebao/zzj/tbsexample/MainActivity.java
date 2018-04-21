@@ -14,8 +14,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.JsResult;
@@ -33,7 +33,7 @@ public class MainActivity extends Activity implements OnClickListener {
     //Button mz_button;
     ImageView mz_imageview;
     String mz_url;
-    LinearLayout mz_llayout1;
+    RelativeLayout mz_llayout1;
     int mz_llayout1place[];
     Animation mz_animation = null;
     ProgressBar mz_pb;
@@ -75,7 +75,7 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
         mz_animation.setRepeatMode(Animation.RESTART);
 
-        mz_llayout1 = (LinearLayout) this.findViewById(R.id.llayout1);
+        mz_llayout1 = (RelativeLayout) this.findViewById(R.id.llayout1);
 
         mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);

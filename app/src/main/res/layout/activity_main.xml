@@ -19,45 +19,37 @@
             android:paddingRight="5dp" />
     </FrameLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/llayout1"
+        android:focusable="false"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="48dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/mzImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/refresh" />
+        <EditText
+            android:id="@+id/mzEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/viewbackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/mzEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="text"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:text="@string/index_site" />
-
-            <ImageView
-                android:id="@+id/mzImageView"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/refresh" />
-
-
-        </LinearLayout>
+            android:layout_toLeftOf="@+id/mzImageView"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@string/index_site" />
 
         <ProgressBar
             android:id="@+id/mzprogressBar1"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="3dip"
+            android:layout_alignParentBottom="true"
             android:progressDrawable="@drawable/pg"
             android:visibility="gone" />
-    </LinearLayout>
+    </RelativeLayout>
 </FrameLayout>
