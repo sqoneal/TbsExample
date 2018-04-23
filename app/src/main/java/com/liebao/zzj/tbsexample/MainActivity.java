@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -30,7 +32,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
     EditText mz_edittext;
     WebView mz_tbs_webview;
-    //Button mz_button;
+    LinearLayout mz_tool_layout;
+    Animation mz_toollayout_animation;
+    Animation mz_toollayout_animation2;
+    ImageView mz_back_imageview;
+    ImageView mz_forward_imageview;
+    ImageView mz_add_imageview;
+    ImageView mz_share_imageview;
     ImageView mz_imageview;
     String mz_url;
     RelativeLayout mz_llayout1;
@@ -70,6 +78,18 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_imageview = (ImageView) this.findViewById(R.id.mzImageView);
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);
         mz_pb = (ProgressBar) this.findViewById(R.id.mzprogressBar1);
+        mz_add_imageview = (ImageView) this.findViewById(R.id.mz_add_imageview);
+        mz_back_imageview = (ImageView) this.findViewById(R.id.mz_back_imageview);
+        mz_forward_imageview = (ImageView) this.findViewById(R.id.mz_forward_imageview);
+        mz_share_imageview = (ImageView) this.findViewById(R.id.mz_share_imageview);
+        mz_tool_layout = (LinearLayout) this.findViewById(R.id.mzToollayout);
+        mz_toollayout_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_translate);
+        mz_toollayout_animation2 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
+
+        mz_add_imageview.setOnClickListener(this);
+        mz_back_imageview.setOnClickListener(this);
+        mz_forward_imageview.setOnClickListener(this);
+        mz_share_imageview.setOnClickListener(this);
         mz_imageview.setOnClickListener(this);
         mz_edittext.setOnClickListener(this);
         mz_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
@@ -124,7 +144,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 mz_edittext.setText(mz_tbs_webview.getUrl());
                 if (mz_llayout1place == null) {
-                    mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom()};
+                    mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom(),
+                            mz_tool_layout.getTop(), mz_tool_layout.getBottom()};
                 }
                 mz_llayout1.setTop(mz_llayout1place[0]);
                 mz_llayout1.setBottom(mz_llayout1place[1]);
@@ -139,30 +160,37 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (scrollY > oldScrollY) {
-                    //mz_llayout1.setVisibility(View.INVISIBLE);
                     int scroll_diff = scrollY - oldScrollY;
                     if (mz_llayout1.getBottom() - scroll_diff < 0) {
                         mz_llayout1.setTop(-mz_llayout1place[1]);
                         mz_llayout1.setBottom(0);
-                        //setJsinobar(0);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() - scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() - scroll_diff);
-                        //setJsinobar(mz_llayout1.getBottom() - scroll_diff);
                     }
-
+                    if (mz_tool_layout.getVisibility() != View.GONE){
+                        mz_tool_layout.startAnimation(mz_toollayout_animation);
+                        mz_tool_layout.setVisibility(View.GONE);
+                    }
+                    Log.e("----",mz_llayout1.getTop()+"");
                 }
                 if (scrollY < oldScrollY) {
-                    //mz_llayout1.setVisibility(View.VISIBLE);
                     int scroll_diff = oldScrollY - scrollY;
                     if (mz_llayout1.getTop() + scroll_diff > 0) {
                         mz_llayout1.setTop(0);
                         mz_llayout1.setBottom(mz_llayout1place[1]);
-                        //setJsinobar(mz_llayout1place[1]);
                     } else {
                         mz_llayout1.setTop(mz_llayout1.getTop() + scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() + scroll_diff);
-                        //setJsinobar(mz_llayout1.getBottom() + scroll_diff);
+                    }
+
+                    if (mz_tool_layout.getVisibility() == View.GONE){
+                        mz_tool_layout.setVisibility(View.VISIBLE);
+                        mz_tool_layout.startAnimation(mz_toollayout_animation2);
+                        /*mz_add_imageview.startAnimation(mz_toollayout_animation2);
+                        mz_back_imageview.startAnimation(mz_toollayout_animation2);
+                        mz_forward_imageview.startAnimation(mz_toollayout_animation2);
+                        mz_share_imageview.startAnimation(mz_toollayout_animation2);*/
                     }
                 }
             }
@@ -180,7 +208,6 @@ public class MainActivity extends Activity implements OnClickListener {
                 "\tvar first=document.body.firstChild;\n" +
                 "\tdocument.body.insertBefore(para,first);\n" +
                 "}");
-        //this.mz_llayout1.setVisibility(View.GONE);
     }
 
    /* public void setJsinobar(int height) {
@@ -203,6 +230,14 @@ public class MainActivity extends Activity implements OnClickListener {
             mz_tbs_webview.loadUrl(mz_url);
         } else if (v == mz_edittext) {
             mz_edittext.setSelection(0, mz_edittext.getText().length());
+        } else if (v == mz_back_imageview) {
+            if (mz_tbs_webview.canGoBack()) {
+                mz_tbs_webview.goBack();
+            }
+        } else if (v == mz_forward_imageview) {
+            if (mz_tbs_webview.canGoForward()) {
+                mz_tbs_webview.goForward();
+            }
         }
     }
 

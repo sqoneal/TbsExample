@@ -21,6 +21,7 @@
 
     <RelativeLayout
         android:id="@+id/llayout1"
+        android:background="@color/viewbackground"
         android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="48dp">
@@ -47,9 +48,45 @@
             android:id="@+id/mzprogressBar1"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="3dip"
+            android:layout_height="3dp"
             android:layout_alignParentBottom="true"
             android:progressDrawable="@drawable/pg"
             android:visibility="gone" />
     </RelativeLayout>
+
+    <LinearLayout
+        android:focusable="false"
+        android:background="@color/viewbackground"
+        android:id="@+id/mzToollayout"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:id="@+id/mz_back_imageview"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:background="@drawable/back"/>
+        <ImageView
+            android:id="@+id/mz_forward_imageview"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:background="@drawable/forward"/>
+        <ImageView
+            android:id="@+id/mz_add_imageview"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:background="@drawable/add"/>
+        <ImageView
+            android:id="@+id/mz_share_imageview"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:background="@drawable/share"/>
+    </LinearLayout>
 </FrameLayout>
