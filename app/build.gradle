@@ -20,10 +20,10 @@ android {
             renderscriptDebuggable false
         }
         debug {
-            jniDebuggable false
             renderscriptDebuggable false
             minifyEnabled false
             debuggable false
+            zipAlignEnabled false
         }
     }
     sourceSets {

@@ -2,6 +2,7 @@ package com.liebao.zzj.tbsexample;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,7 +66,15 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (getIntent().getData() != null) {
+            Log.e("intent",getIntent().getDataString());
+            mz_url = getIntent().getDataString();
+        }
         initview();
+        /*Intent intent = new Intent();
+        if (!intent.getCategories().isEmpty()){
+            mz_url = intent.getCategories().toString();
+        }*/
     }
 
     @Override
@@ -100,7 +109,9 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
         mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);
 
-        mz_url = mz_edittext.getText().toString();
+        if (mz_url == null) {
+            mz_url = mz_edittext.getText().toString();
+        }
         mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
         mz_tbs_webview.loadUrl(mz_url);
 
@@ -168,11 +179,10 @@ public class MainActivity extends Activity implements OnClickListener {
                         mz_llayout1.setTop(mz_llayout1.getTop() - scroll_diff);
                         mz_llayout1.setBottom(mz_llayout1.getBottom() - scroll_diff);
                     }
-                    if (mz_tool_layout.getVisibility() != View.GONE){
+                    if (mz_tool_layout.getVisibility() != View.GONE) {
                         mz_tool_layout.startAnimation(mz_toollayout_animation);
                         mz_tool_layout.setVisibility(View.GONE);
                     }
-                    Log.e("----",mz_llayout1.getTop()+"");
                 }
                 if (scrollY < oldScrollY) {
                     int scroll_diff = oldScrollY - scrollY;
@@ -184,7 +194,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         mz_llayout1.setBottom(mz_llayout1.getBottom() + scroll_diff);
                     }
 
-                    if (mz_tool_layout.getVisibility() == View.GONE){
+                    if (mz_tool_layout.getVisibility() == View.GONE) {
                         mz_tool_layout.setVisibility(View.VISIBLE);
                         mz_tool_layout.startAnimation(mz_toollayout_animation2);
                         /*mz_add_imageview.startAnimation(mz_toollayout_animation2);
@@ -238,6 +248,8 @@ public class MainActivity extends Activity implements OnClickListener {
             if (mz_tbs_webview.canGoForward()) {
                 mz_tbs_webview.goForward();
             }
+        } else if (v == mz_share_imageview) {
+            shareapp();
         }
     }
 
@@ -248,5 +260,13 @@ public class MainActivity extends Activity implements OnClickListener {
             return false;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void shareapp() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "share");
+        intent.putExtra(Intent.EXTRA_TEXT, "This is my browser.");
+        startActivity(Intent.createChooser(intent, "choose the share way"));
     }
 }
