@@ -71,10 +71,6 @@ public class MainActivity extends Activity implements OnClickListener {
             mz_url = getIntent().getDataString();
         }
         initview();
-        /*Intent intent = new Intent();
-        if (!intent.getCategories().isEmpty()){
-            mz_url = intent.getCategories().toString();
-        }*/
     }
 
     @Override

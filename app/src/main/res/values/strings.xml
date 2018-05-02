@@ -2,4 +2,5 @@
     <string name="app_name">TbsExample</string>
     <string name="index_site">http://nba.qq.com</string>
     <string name="clickgo">GO</string>
+    <string name="skip">跳过</string>
 </resources>
