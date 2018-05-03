@@ -22,8 +22,9 @@ android {
         debug {
             renderscriptDebuggable false
             minifyEnabled false
-            debuggable false
-            zipAlignEnabled false
+            debuggable true
+            zipAlignEnabled true
+            jniDebuggable false
         }
     }
     sourceSets {
