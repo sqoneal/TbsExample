@@ -56,6 +56,9 @@ public class MainActivity extends Activity implements OnClickListener {
     int mz_llayout1place[];
     Animation mz_animation = null;
     ProgressBar mz_pb;
+    private int clipindex = 0;
+
+    //private WebView mz_child_webview[];
 
     Handler mz_handler = new Handler() {
         @Override
@@ -80,6 +83,12 @@ public class MainActivity extends Activity implements OnClickListener {
             mz_url = getIntent().getDataString();
         }
         initview();
+    }
+
+    @Override
+    protected void onResume() {
+        clipUrltip();
+        super.onResume();
     }
 
     @Override
@@ -128,56 +137,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
 
-        //获取判断剪切板是否有网址
-        final ClipboardManager mz_clipboardmanager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData.Item mz_item = mz_clipboardmanager.getPrimaryClip().getItemAt(0);
-        final String tempurl = mz_item.getText().toString();
-        if (tempurl.startsWith("http://") || tempurl.startsWith("https://")) {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setIcon(R.mipmap.ic_launcher)//设置标题的图片
-                    .setTitle("是否打开复制的网址？")//设置对话框的标题
-                    //.setMessage("我是对话框的内容")//设置对话框的内容
-                    //设置对话框的按钮
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mz_url = tempurl;
-                            mz_tbs_webview.loadUrl(mz_url);
-                            dialog.dismiss();
-                        }
-                    }).create();
-            dialog.show();
-        }
-        if (tempurl.startsWith("www")) {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setIcon(R.mipmap.ic_launcher)//设置标题的图片
-                    .setTitle("是否打开复制的网址？")//设置对话框的标题
-                    //.setMessage("我是对话框的内容")//设置对话框的内容
-                    //设置对话框的按钮
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mz_url = "http://" + tempurl;
-                            mz_tbs_webview.loadUrl(mz_url);
-                            dialog.dismiss();
-                        }
-                    }).create();
-            dialog.show();
-
-        }
-
+        clipUrltip();
         if (mz_url == null) {
             mz_url = mz_edittext.getText().toString();
         }
@@ -445,5 +405,61 @@ public class MainActivity extends Activity implements OnClickListener {
         intent.putExtra(Intent.EXTRA_SUBJECT, "share");
         intent.putExtra(Intent.EXTRA_TEXT, "This is my browser.");
         startActivity(Intent.createChooser(intent, "choose the share way"));
+    }
+
+    private void clipUrltip() {
+        //获取判断剪切板是否有网址
+        final ClipboardManager mz_clipboardmanager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData.Item mz_item;
+        if (mz_clipboardmanager.hasPrimaryClip() && clipindex == 0) {
+            mz_item = mz_clipboardmanager.getPrimaryClip().getItemAt(clipindex);
+            clipindex++;
+            final String tempurl = mz_item.getText().toString();
+            if ((tempurl.startsWith("http://") || tempurl.startsWith("https://"))) {
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setIcon(R.mipmap.ic_launcher)//设置标题的图片
+                        .setTitle("是否打开复制的网址？")//设置对话框的标题
+                        //.setMessage("我是对话框的内容")//设置对话框的内容
+                        //设置对话框的按钮
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mz_url = tempurl;
+                                mz_tbs_webview.loadUrl(mz_url);
+                                dialog.dismiss();
+                            }
+                        }).create();
+                dialog.show();
+            }
+            if (tempurl.startsWith("www")) {
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setIcon(R.mipmap.ic_launcher)//设置标题的图片
+                        .setTitle("是否打开复制的网址？")//设置对话框的标题
+                        //.setMessage("我是对话框的内容")//设置对话框的内容
+                        //设置对话框的按钮
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mz_url = "http://" + tempurl;
+                                mz_tbs_webview.loadUrl(mz_url);
+                                dialog.dismiss();
+                            }
+                        }).create();
+                dialog.show();
+
+            }
+        }
     }
 }

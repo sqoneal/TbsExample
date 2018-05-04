@@ -10,6 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        ndk { abiFilters "armeabi" }
     }
     buildTypes {
         release {
@@ -30,7 +31,6 @@ android {
     sourceSets {
         main {
             res.srcDirs = ['src/main/res', 'src/main/res/anim']
-            jniLibs.srcDirs = ['jniLibs']
         }
     }
 
