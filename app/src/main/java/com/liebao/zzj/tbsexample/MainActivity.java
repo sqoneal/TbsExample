@@ -9,11 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
@@ -41,33 +45,42 @@ public class MainActivity extends Activity implements OnClickListener {
     private static final int WEBVIEWGOBACK = 0X123;
     private static final String APP_NAME_UA = " XiaoMi/MiuiBrowser/Zcom/1.0";
 
-    EditText mz_edittext;
-    WebView mz_tbs_webview;
-    LinearLayout mz_tool_layout;
-    Animation mz_toollayout_animation;
-    Animation mz_toollayout_animation2;
-    ImageView mz_back_imageview;
-    ImageView mz_forward_imageview;
-    ImageView mz_add_imageview;
-    ImageView mz_share_imageview;
-    ImageView mz_imageview;
-    String mz_url;
-    RelativeLayout mz_llayout1;
-    int mz_llayout1place[];
-    Animation mz_animation = null;
-    ProgressBar mz_pb;
+    private EditText mz_edittext;
+    //WebView mz_tbs_webview;
+    private FrameLayout mz_web_framelayout;
+    private LinearLayout mz_tool_layout;
+    private Animation mz_toollayout_animation;
+    private Animation mz_toollayout_animation2;
+    private ImageView mz_back_imageview;
+    private ImageView mz_forward_imageview;
+    private ImageView mz_add_imageview;
+    private ImageView mz_share_imageview;
+    private ImageView mz_imageview;
+    private String mz_url;
+    private RelativeLayout mz_llayout1;
+    private int mz_llayout1place[];
+    private Animation mz_animation = null;
+    private ProgressBar mz_pb;
     private int clipindex = 0;
 
-    //private WebView mz_child_webview[];
+    private final static int mz_webviewsum = 10;
+    private WebView mz_child_webview[] = new WebView[mz_webviewsum];
+    private int mz_childcurrentinder = 0;
+    private LinearLayout mz_newtab_layout;
+    private String mz_child_title[] = new String[mz_webviewsum];
+    private String mz_child_url[] = new String[mz_webviewsum];
+    private TextView mz_child_textview[] = new TextView[mz_webviewsum];
+    private TextView mz_newtab_textview;
+    private TextView mz_closetab_textview;
 
     Handler mz_handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case WEBVIEWGOBACK:
-                    if (mz_tbs_webview.canGoBack()) {
-                        mz_tbs_webview.goBack();
-                        mz_edittext.setText(mz_tbs_webview.getUrl());
+                    if (mz_child_webview[mz_childcurrentinder].canGoBack()) {
+                        mz_child_webview[mz_childcurrentinder].goBack();
+                        mz_edittext.setText(mz_child_webview[mz_childcurrentinder].getUrl());
                     } else {
                         finish();
                     }
@@ -123,6 +136,7 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_tool_layout = (LinearLayout) this.findViewById(R.id.mzToollayout);
         mz_toollayout_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_translate);
         mz_toollayout_animation2 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
+        mz_web_framelayout = (FrameLayout) this.findViewById(R.id.mzwebframelayout);
 
         mz_add_imageview.setOnClickListener(this);
         mz_back_imageview.setOnClickListener(this);
@@ -134,34 +148,99 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_animation.setRepeatMode(Animation.RESTART);
 
         mz_llayout1 = (RelativeLayout) this.findViewById(R.id.llayout1);
+        mz_newtab_layout = (LinearLayout) this.findViewById(R.id.mznewtablayout);
+        mz_newtab_textview = (TextView) this.findViewById(R.id.mznewtabtextview);
+        mz_newtab_textview.setOnClickListener(this);
+        mz_closetab_textview = (TextView) this.findViewById(R.id.mzclosetextview);
+        mz_closetab_textview.setOnClickListener(this);
 
-        mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
+        //mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
 
         clipUrltip();
         if (mz_url == null) {
             mz_url = mz_edittext.getText().toString();
         }
+        newChildWebView(mz_url);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void switchChildWebView(int switchindex) {
+        mz_childcurrentinder = switchindex;
+        for (int i = 0; i < mz_webviewsum; i++) {
+            if (mz_child_webview[i] != null && i != switchindex) {
+                mz_child_webview[i].setVisibility(View.GONE);
+                mz_child_textview[i].setTextColor(Color.WHITE);
+            }
+        }
+        mz_child_webview[switchindex].setVisibility(View.VISIBLE);
+        mz_edittext.setText(mz_child_url[switchindex]);
+        if (mz_child_textview[switchindex] != null) {
+            mz_child_textview[switchindex].setTextColor(getApplicationContext().getColor(R.color.currenttext));
+        }
+    }
+
+    private int closeChildWebView() {
+        mz_web_framelayout.removeView(mz_child_webview[mz_childcurrentinder]);
+        mz_newtab_layout.removeView(mz_child_textview[mz_childcurrentinder]);
+        mz_child_webview[mz_childcurrentinder] = null;
+        mz_child_textview[mz_childcurrentinder] = null;
+        mz_child_title[mz_childcurrentinder] = null;
+        mz_child_url[mz_childcurrentinder] = null;
+
+        for (int i = mz_childcurrentinder - 1; i >= 0; i--) {
+            if (mz_child_webview[i] != null) {
+                switchChildWebView(i);
+                return i;
+            }
+        }
+
+        for (int i = mz_childcurrentinder + 1; i < mz_webviewsum; i++) {
+            if (mz_child_webview[i] != null) {
+                switchChildWebView(i);
+                return i;
+            }
+        }
+
+        newChildWebView(mz_url);
+        return 0;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean newChildWebView(String childmurl) {
+        for (int i = 0; i < mz_webviewsum; i++) {
+            if (mz_child_webview[i] == null) {
+                mz_childcurrentinder = i;
+                break;
+            }
+            if (i == mz_webviewsum - 1) {
+                Toast.makeText(this, "已超过最大新建页面数", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        mz_child_webview[mz_childcurrentinder] = new WebView(this);
+        switchChildWebView(mz_childcurrentinder);
+        mz_web_framelayout.addView(mz_child_webview[mz_childcurrentinder]);
 
         //设置UA
-        mz_tbs_webview.getSettings().setUserAgentString(mz_tbs_webview.getSettings().getUserAgentString() + APP_NAME_UA);
+        mz_child_webview[mz_childcurrentinder].getSettings().setUserAgentString(mz_child_webview[mz_childcurrentinder].getSettings().getUserAgentString() + APP_NAME_UA);
         //设置WebView属性，能够执行Javascript脚本
-        mz_tbs_webview.getSettings().setJavaScriptEnabled(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setJavaScriptEnabled(true);
         //设置WebView 可以加载更多格式页面
-        mz_tbs_webview.getSettings().setLoadWithOverviewMode(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setLoadWithOverviewMode(true);
         //设置WebView使用广泛的视窗
-        mz_tbs_webview.getSettings().setUseWideViewPort(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setUseWideViewPort(true);
         //支持手势缩放
-        mz_tbs_webview.getSettings().setBuiltInZoomControls(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setBuiltInZoomControls(true);
         //支持2.2以上所有版本
-        mz_tbs_webview.getSettings().setPluginState(WebSettings.PluginState.ON);
+        mz_child_webview[mz_childcurrentinder].getSettings().setPluginState(WebSettings.PluginState.ON);
         //告诉webview启用应用程序缓存api。
-        mz_tbs_webview.getSettings().setAppCacheEnabled(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setAppCacheEnabled(true);
         //设置是否启用了DOM storage API。
-        mz_tbs_webview.getSettings().setDomStorageEnabled(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setDomStorageEnabled(true);
         //自动打开窗口
-        mz_tbs_webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         // 没有的话会黑屏 支持插件
-        mz_tbs_webview.getSettings().setPluginsEnabled(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setPluginsEnabled(true);
 
         /**
          * setAllowFileAccess 启用或禁止WebView访问文件数据 setBlockNetworkImage 是否显示网络图像
@@ -171,15 +250,14 @@ public class MainActivity extends Activity implements OnClickListener {
          * setLayoutAlgorithm 设置布局方式 setLightTouchEnabled 设置用鼠标激活被选项
          * setSupportZoom 设置是否支持变焦
          * */
-        mz_tbs_webview.getSettings().setAllowFileAccess(true);
-        mz_tbs_webview.getSettings().setBuiltInZoomControls(true);
-        mz_tbs_webview.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-        mz_tbs_webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mz_child_webview[mz_childcurrentinder].getSettings().setAllowFileAccess(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setBuiltInZoomControls(true);
+        mz_child_webview[mz_childcurrentinder].getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        mz_child_webview[mz_childcurrentinder].getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
+        mz_child_webview[mz_childcurrentinder].loadUrl(childmurl);
 
-        mz_tbs_webview.loadUrl(mz_url);
-
-        mz_tbs_webview.setWebChromeClient(new WebChromeClient() {
+        mz_child_webview[mz_childcurrentinder].setWebChromeClient(new WebChromeClient() {
             // 一个回调接口使用的主机应用程序通知当前页面的自定义视图已被撤职
             IX5WebChromeClient.CustomViewCallback customViewCallback;
 
@@ -190,7 +268,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 赋值给callback
                 customViewCallback = callback;
                 // 设置webView隐藏
-                mz_tbs_webview.setVisibility(View.GONE);
+                mz_web_framelayout.setVisibility(View.GONE);
                 mz_llayout1.setVisibility(View.GONE);
                 mz_tool_layout.setVisibility(View.GONE);
                 // 声明video，把之后的视频放到这里面去
@@ -217,7 +295,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 退出全屏
                 quitFullScreen();
                 // 设置WebView可见
-                mz_tbs_webview.setVisibility(View.VISIBLE);
+                mz_web_framelayout.setVisibility(View.VISIBLE);
                 mz_llayout1.setVisibility(View.VISIBLE);
                 mz_tool_layout.setVisibility(View.VISIBLE);
 
@@ -245,7 +323,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 return super.onConsoleMessage(consoleMessage);
             }
         });
-        mz_tbs_webview.setWebViewClient(new WebViewClient() {
+        mz_child_webview[mz_childcurrentinder].setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, String s) {
                 return super.shouldOverrideUrlLoading(webView, s);
@@ -260,29 +338,46 @@ public class MainActivity extends Activity implements OnClickListener {
             public void onPageStarted(WebView webView, String s, Bitmap bitmap) {
                 super.onPageStarted(webView, s, bitmap);
                 mz_imageview.startAnimation(mz_animation);
+                mz_newtab_layout.setVisibility(View.GONE);
             }
 
             @Override
             public void onPageFinished(WebView webView, String s) {
                 super.onPageFinished(webView, s);
 
-                mz_edittext.setText(mz_tbs_webview.getUrl());
+                mz_child_url[mz_childcurrentinder] = mz_child_webview[mz_childcurrentinder].getUrl();
+                mz_child_title[mz_childcurrentinder] = mz_child_webview[mz_childcurrentinder].getTitle();
+                mz_edittext.setText(mz_child_url[mz_childcurrentinder]);
+                if (mz_child_textview[mz_childcurrentinder] == null) {
+                    mz_child_textview[mz_childcurrentinder] = new TextView(getApplicationContext());
+                    mz_child_textview[mz_childcurrentinder].setTextSize(20);
+                    mz_child_textview[mz_childcurrentinder].setMaxLines(1);
+                    mz_child_textview[mz_childcurrentinder].setGravity(Gravity.CENTER);
+                    mz_child_textview[mz_childcurrentinder].setOnClickListener(MainActivity.this);
+                    mz_newtab_layout.addView(mz_child_textview[mz_childcurrentinder]);
+                }
+                mz_child_textview[mz_childcurrentinder].setText(mz_child_title[mz_childcurrentinder]);
+                //mz_child_textview[mz_childcurrentinder].setText(mz_child_webview[mz_childcurrentinder].getTitle());
+                //mz_child_textview[mz_childcurrentinder].setTextColor(getApplicationContext().getColor(R.color.currenttext));
+                switchChildWebView(mz_childcurrentinder);
+
                 if (mz_llayout1place == null) {
                     mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom(),
                             mz_tool_layout.getTop(), mz_tool_layout.getBottom()};
                 }
+
                 mz_llayout1.setTop(mz_llayout1place[0]);
                 mz_llayout1.setBottom(mz_llayout1place[1]);
 
-                addJsinfobar(mz_llayout1place[1]);
-                //mz_tbs_webview.setTop(mz_llayout1place[1]);
+                addJsinfobar(mz_child_webview[mz_childcurrentinder], mz_llayout1place[1]);
                 mz_imageview.clearAnimation();
             }
         });
 
-        mz_tbs_webview.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+        mz_child_webview[mz_childcurrentinder].setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                mz_newtab_layout.setVisibility(View.GONE);
                 if (scrollY > oldScrollY) {
                     int scroll_diff = scrollY - oldScrollY;
                     if (mz_llayout1.getBottom() - scroll_diff < 0) {
@@ -310,14 +405,11 @@ public class MainActivity extends Activity implements OnClickListener {
                     if (mz_tool_layout.getVisibility() == View.GONE) {
                         mz_tool_layout.setVisibility(View.VISIBLE);
                         mz_tool_layout.startAnimation(mz_toollayout_animation2);
-                        /*mz_add_imageview.startAnimation(mz_toollayout_animation2);
-                        mz_back_imageview.startAnimation(mz_toollayout_animation2);
-                        mz_forward_imageview.startAnimation(mz_toollayout_animation2);
-                        mz_share_imageview.startAnimation(mz_toollayout_animation2);*/
                     }
                 }
             }
         });
+        return true;
     }
 
     /**
@@ -342,8 +434,8 @@ public class MainActivity extends Activity implements OnClickListener {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 
-    public void addJsinfobar(int height) {
-        this.mz_tbs_webview.loadUrl("javascript:" +
+    public void addJsinfobar(WebView mwebview, int height) {
+        mwebview.loadUrl("javascript:" +
                 "if(document.getElementById(\"tsbexamplehide\")) \n" +
                 "{ \n" +
                 "}else{\n" +
@@ -355,15 +447,9 @@ public class MainActivity extends Activity implements OnClickListener {
                 "}");
     }
 
-   /* public void setJsinobar(int height) {
-        Log.e("test", "" + height + "   " + mz_llayout1.getBottom());
-
-        *//*this.mz_tbs_webview.loadUrl("javascript:" +
-                "document.getElementById(\"tsbexamplehide\").style.height = '" + (height / 2) + "';");*//*
-    }*/
-
     @Override
     public void onClick(View v) {
+        mz_newtab_layout.setVisibility(View.GONE);
         if (v == mz_imageview) {
             mz_url = mz_edittext.getText().toString();
             if (mz_url == null) {
@@ -372,19 +458,32 @@ public class MainActivity extends Activity implements OnClickListener {
             if (!(mz_url.startsWith("http://") || mz_url.startsWith("https://"))) {
                 mz_url = "http://" + mz_url;
             }
-            mz_tbs_webview.loadUrl(mz_url);
+            mz_child_webview[mz_childcurrentinder].loadUrl(mz_url);
+            mz_url = this.getResources().getString(R.string.index_site);//还原配置的主页
         } else if (v == mz_edittext) {
             mz_edittext.setSelection(0, mz_edittext.getText().length());
         } else if (v == mz_back_imageview) {
-            if (mz_tbs_webview.canGoBack()) {
-                mz_tbs_webview.goBack();
+            if (mz_child_webview[mz_childcurrentinder].canGoBack()) {
+                mz_child_webview[mz_childcurrentinder].goBack();
             }
         } else if (v == mz_forward_imageview) {
-            if (mz_tbs_webview.canGoForward()) {
-                mz_tbs_webview.goForward();
+            if (mz_child_webview[mz_childcurrentinder].canGoForward()) {
+                mz_child_webview[mz_childcurrentinder].goForward();
             }
         } else if (v == mz_share_imageview) {
             shareapp();
+        } else if (v == mz_add_imageview) {
+            mz_newtab_layout.setVisibility(View.VISIBLE);
+        } else if (v == mz_newtab_textview) {
+            newChildWebView(mz_url);
+        } else if (v == mz_closetab_textview) {
+            closeChildWebView();
+        } else {
+            for (int i = 0; i < mz_webviewsum; i++) {
+                if (mz_child_textview[i] != null && v == mz_child_textview[i]) {
+                    switchChildWebView(i);
+                }
+            }
         }
     }
 
@@ -431,7 +530,7 @@ public class MainActivity extends Activity implements OnClickListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mz_url = tempurl;
-                                mz_tbs_webview.loadUrl(mz_url);
+                                mz_child_webview[mz_childcurrentinder].loadUrl(mz_url);
                                 dialog.dismiss();
                             }
                         }).create();
@@ -453,7 +552,7 @@ public class MainActivity extends Activity implements OnClickListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mz_url = "http://" + tempurl;
-                                mz_tbs_webview.loadUrl(mz_url);
+                                mz_child_webview[mz_childcurrentinder].loadUrl(mz_url);
                                 dialog.dismiss();
                             }
                         }).create();

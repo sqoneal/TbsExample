@@ -3,4 +3,6 @@
     <string name="index_site">http://nba.qq.com</string>
     <string name="clickgo">GO</string>
     <string name="skip">跳过</string>
+    <string name="newtab">新建页面</string>
+    <string name="closetab">关闭页面</string>
 </resources>
