@@ -175,7 +175,11 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_child_webview[switchindex].setVisibility(View.VISIBLE);
         mz_edittext.setText(mz_child_url[switchindex]);
         if (mz_child_textview[switchindex] != null) {
-            mz_child_textview[switchindex].setTextColor(getApplicationContext().getColor(R.color.currenttext));
+            if (Build.VERSION.SDK_INT < 23) {
+                mz_child_textview[mz_childcurrentinder].setTextColor(Color.BLUE);
+            } else {
+                mz_child_textview[switchindex].setTextColor(getApplicationContext().getColor(R.color.currenttext));
+            }
         }
     }
 
@@ -344,7 +348,6 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onPageFinished(WebView webView, String s) {
                 super.onPageFinished(webView, s);
-
                 mz_child_url[mz_childcurrentinder] = mz_child_webview[mz_childcurrentinder].getUrl();
                 mz_child_title[mz_childcurrentinder] = mz_child_webview[mz_childcurrentinder].getTitle();
                 mz_edittext.setText(mz_child_url[mz_childcurrentinder]);
@@ -357,10 +360,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     mz_newtab_layout.addView(mz_child_textview[mz_childcurrentinder]);
                 }
                 mz_child_textview[mz_childcurrentinder].setText(mz_child_title[mz_childcurrentinder]);
-                //mz_child_textview[mz_childcurrentinder].setText(mz_child_webview[mz_childcurrentinder].getTitle());
-                //mz_child_textview[mz_childcurrentinder].setTextColor(getApplicationContext().getColor(R.color.currenttext));
                 switchChildWebView(mz_childcurrentinder);
-
                 if (mz_llayout1place == null) {
                     mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom(),
                             mz_tool_layout.getTop(), mz_tool_layout.getBottom()};
@@ -368,6 +368,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 mz_llayout1.setTop(mz_llayout1place[0]);
                 mz_llayout1.setBottom(mz_llayout1place[1]);
+
 
                 addJsinfobar(mz_child_webview[mz_childcurrentinder], mz_llayout1place[1]);
                 mz_imageview.clearAnimation();
