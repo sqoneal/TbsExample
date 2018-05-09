@@ -8,6 +8,8 @@ import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
@@ -31,9 +33,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.liebao.zzj.tbsexample.utils.MzSqLiteOpenHelper;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsResult;
+import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
@@ -49,17 +53,13 @@ public class MainActivity extends Activity implements OnClickListener {
     //WebView mz_tbs_webview;
     private FrameLayout mz_web_framelayout;
     private LinearLayout mz_tool_layout;
-    private Animation mz_toollayout_animation;
-    private Animation mz_toollayout_animation2;
-    private ImageView mz_back_imageview;
-    private ImageView mz_forward_imageview;
-    private ImageView mz_add_imageview;
-    private ImageView mz_share_imageview;
+    private Animation mz_toollayout_animation,mz_toollayout_animation2,mz_bookmark_animation,mz_animation;
+    private ImageView mz_back_imageview, mz_forward_imageview, mz_add_imageview, mz_share_imageview, mz_bookmark_imageview;
+    private boolean mz_ischangebookmarkimage = false;
     private ImageView mz_imageview;
     private String mz_url;
     private RelativeLayout mz_llayout1;
     private int mz_llayout1place[];
-    private Animation mz_animation = null;
     private ProgressBar mz_pb;
     private int clipindex = 0;
 
@@ -72,6 +72,9 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView mz_child_textview[] = new TextView[mz_webviewsum];
     private TextView mz_newtab_textview;
     private TextView mz_closetab_textview;
+
+    private MzSqLiteOpenHelper mzSqLiteOpenHelper;
+    private SQLiteDatabase mzdb;
 
     Handler mz_handler = new Handler() {
         @Override
@@ -106,6 +109,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onDestroy() {
+        mzdb.close();
+        mzSqLiteOpenHelper.close();
         super.onDestroy();
     }
 
@@ -125,6 +130,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 Log.e("@@", "加载内核是否成功:" + b);
             }
         });
+        mzSqLiteOpenHelper = new MzSqLiteOpenHelper(this, "mz.db", null, 1);
 
         mz_imageview = (ImageView) this.findViewById(R.id.mzImageView);
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);
@@ -133,15 +139,18 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_back_imageview = (ImageView) this.findViewById(R.id.mz_back_imageview);
         mz_forward_imageview = (ImageView) this.findViewById(R.id.mz_forward_imageview);
         mz_share_imageview = (ImageView) this.findViewById(R.id.mz_share_imageview);
+        mz_bookmark_imageview = (ImageView) this.findViewById(R.id.mz_bookmark_imageview);
         mz_tool_layout = (LinearLayout) this.findViewById(R.id.mzToollayout);
         mz_toollayout_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_translate);
         mz_toollayout_animation2 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
+        mz_bookmark_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_bookmark_rotate_scale_set);
         mz_web_framelayout = (FrameLayout) this.findViewById(R.id.mzwebframelayout);
 
         mz_add_imageview.setOnClickListener(this);
         mz_back_imageview.setOnClickListener(this);
         mz_forward_imageview.setOnClickListener(this);
         mz_share_imageview.setOnClickListener(this);
+        mz_bookmark_imageview.setOnClickListener(this);
         mz_imageview.setOnClickListener(this);
         mz_edittext.setOnClickListener(this);
         mz_animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_rotate);
@@ -154,7 +163,6 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_closetab_textview = (TextView) this.findViewById(R.id.mzclosetextview);
         mz_closetab_textview.setOnClickListener(this);
 
-        //mz_tbs_webview = (WebView) this.findViewById(R.id.mzTSBWebView);
 
         clipUrltip();
         if (mz_url == null) {
@@ -181,6 +189,18 @@ public class MainActivity extends Activity implements OnClickListener {
                 mz_child_textview[switchindex].setTextColor(getApplicationContext().getColor(R.color.currenttext));
             }
         }
+
+        mzdb = mzSqLiteOpenHelper.getReadableDatabase();
+        Cursor cursor = mzdb.query("bookmarks", null, "url='" + mz_child_url[mz_childcurrentinder] + "'"
+                , null, null, null, null);
+        if (cursor.moveToFirst()) {
+            mz_bookmark_imageview.setImageResource(R.drawable.bookmark2);
+            mz_ischangebookmarkimage = true;
+        } else {
+            mz_bookmark_imageview.setImageResource(R.drawable.bookmark1);
+            mz_ischangebookmarkimage = false;
+        }
+        cursor.close();
     }
 
     private int closeChildWebView() {
@@ -246,7 +266,7 @@ public class MainActivity extends Activity implements OnClickListener {
         // 没有的话会黑屏 支持插件
         mz_child_webview[mz_childcurrentinder].getSettings().setPluginsEnabled(true);
 
-        /**
+        /*
          * setAllowFileAccess 启用或禁止WebView访问文件数据 setBlockNetworkImage 是否显示网络图像
          * setBuiltInZoomControls 设置是否支持缩放 setCacheMode 设置缓冲的模式
          * setDefaultFontSize 设置默认的字体大小 setDefaultTextEncodingName 设置在解码时使用的默认编码
@@ -261,9 +281,17 @@ public class MainActivity extends Activity implements OnClickListener {
 
         mz_child_webview[mz_childcurrentinder].loadUrl(childmurl);
 
+        CookieSyncManager.createInstance(this);
+        CookieSyncManager.getInstance().sync();
+
         mz_child_webview[mz_childcurrentinder].setWebChromeClient(new WebChromeClient() {
             // 一个回调接口使用的主机应用程序通知当前页面的自定义视图已被撤职
             IX5WebChromeClient.CustomViewCallback customViewCallback;
+
+            @Override
+            public boolean onJsConfirm(WebView webView, String s, String s1, JsResult jsResult) {
+                return super.onJsConfirm(webView, s, s1, jsResult);
+            }
 
             // 进入全屏的时候
             @Override
@@ -361,6 +389,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 }
                 mz_child_textview[mz_childcurrentinder].setText(mz_child_title[mz_childcurrentinder]);
                 switchChildWebView(mz_childcurrentinder);
+
                 if (mz_llayout1place == null) {
                     mz_llayout1place = new int[]{mz_llayout1.getTop(), mz_llayout1.getBottom(),
                             mz_tool_layout.getTop(), mz_tool_layout.getBottom()};
@@ -450,7 +479,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     public void onClick(View v) {
-        mz_newtab_layout.setVisibility(View.GONE);
         if (v == mz_imageview) {
             mz_url = mz_edittext.getText().toString();
             if (mz_url == null) {
@@ -473,18 +501,54 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         } else if (v == mz_share_imageview) {
             shareapp();
-        } else if (v == mz_add_imageview) {
-            mz_newtab_layout.setVisibility(View.VISIBLE);
         } else if (v == mz_newtab_textview) {
             newChildWebView(mz_url);
         } else if (v == mz_closetab_textview) {
             closeChildWebView();
+        } else if (v == mz_bookmark_imageview) {
+            /*if (Build.VERSION.SDK_INT > 23){
+                if (mz_bookmark_imageview.getDrawable().getCurrent().getConstantState().equals
+                        (getResources().getDrawable(R.drawable.bookmark1).getConstantState())) {
+                    mz_bookmark_imageview.setImageResource(R.drawable.bookmark2);
+                } else {
+                    mz_bookmark_imageview.setImageResource(R.drawable.bookmark1);
+                }
+            }*/
+            if (mz_ischangebookmarkimage) {
+                mzdb = mzSqLiteOpenHelper.getWritableDatabase();
+                String sqlstr = "delete from bookmarks where url = '" + mz_child_url[mz_childcurrentinder] + "'";
+                mzdb.execSQL(sqlstr);
+
+                mz_bookmark_imageview.setImageResource(R.drawable.bookmark1);
+                mz_ischangebookmarkimage = false;
+                Toast.makeText(this, "取消收藏", Toast.LENGTH_SHORT).show();
+            } else {
+                mzdb = mzSqLiteOpenHelper.getWritableDatabase();
+                String sqlstr = "insert into bookmarks(title,url) values('" + mz_child_title[mz_childcurrentinder]
+                        + "','" + mz_child_url[mz_childcurrentinder] + "')";
+                mzdb.execSQL(sqlstr);
+
+                mz_bookmark_imageview.setImageResource(R.drawable.bookmark2);
+                mz_ischangebookmarkimage = true;
+                Toast.makeText(this, "添加收藏", Toast.LENGTH_SHORT).show();
+            }
+            mz_bookmark_imageview.startAnimation(mz_bookmark_animation);
         } else {
             for (int i = 0; i < mz_webviewsum; i++) {
                 if (mz_child_textview[i] != null && v == mz_child_textview[i]) {
                     switchChildWebView(i);
                 }
             }
+        }
+        //下面分开处理使每个点击事件都隐藏新建页面layout层，而+号键判断处理层隐藏和出现
+        if (v == mz_add_imageview) {
+            if (mz_newtab_layout.getVisibility() == View.GONE) {
+                mz_newtab_layout.setVisibility(View.VISIBLE);
+            } else if (mz_newtab_layout.getVisibility() == View.VISIBLE) {
+                mz_newtab_layout.setVisibility(View.GONE);
+            }
+        } else {
+            mz_newtab_layout.setVisibility(View.GONE);
         }
     }
 

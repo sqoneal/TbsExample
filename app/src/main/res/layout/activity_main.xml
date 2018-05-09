@@ -88,6 +88,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/newtab" />
+            <View
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
             <TextView
                 android:id="@+id/mzclosetextview"
                 android:textSize="20dp"
@@ -100,7 +106,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@android:color/black"/>
-
+            <TextView
+                android:id="@+id/mzmanagebookmarktextview"
+                android:textSize="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/managebookmark" />
+            <View
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black"/>
         </LinearLayout>
 
         <LinearLayout
@@ -117,28 +134,35 @@
                 android:layout_width="30dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/back" />
+                android:src="@drawable/back" />
 
             <ImageView
                 android:id="@+id/mz_forward_imageview"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/forward" />
+                android:src="@drawable/forward" />
 
             <ImageView
                 android:id="@+id/mz_add_imageview"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/add" />
+                android:src="@drawable/add" />
+
+            <ImageView
+                android:id="@+id/mz_bookmark_imageview"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:src="@drawable/bookmark1" />
 
             <ImageView
                 android:id="@+id/mz_share_imageview"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/share" />
+                android:src="@drawable/share" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
