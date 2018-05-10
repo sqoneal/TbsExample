@@ -48,13 +48,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private static final int WEBVIEWGOBACK = 0X123;
     private static final String APP_NAME_UA = " XiaoMi/MiuiBrowser/Zcom/1.0";
+    public static final int FROMBOOKMARK = 0x211;
 
     private EditText mz_edittext;
     //WebView mz_tbs_webview;
     private FrameLayout mz_web_framelayout;
     private LinearLayout mz_tool_layout;
-    private Animation mz_toollayout_animation,mz_toollayout_animation2,mz_bookmark_animation,mz_animation;
-    private ImageView mz_back_imageview, mz_forward_imageview, mz_add_imageview, mz_share_imageview, mz_bookmark_imageview;
+    private Animation mz_toollayout_animation, mz_toollayout_animation2, mz_bookmark_animation, mz_animation;
+    private ImageView mz_back_imageview, mz_forward_imageview, mz_add_imageview,
+            mz_share_imageview, mz_bookmark_imageview;
     private boolean mz_ischangebookmarkimage = false;
     private ImageView mz_imageview;
     private String mz_url;
@@ -70,8 +72,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private String mz_child_title[] = new String[mz_webviewsum];
     private String mz_child_url[] = new String[mz_webviewsum];
     private TextView mz_child_textview[] = new TextView[mz_webviewsum];
-    private TextView mz_newtab_textview;
-    private TextView mz_closetab_textview;
+    private TextView mz_newtab_textview, mz_managebookmark_textview, mz_closetab_textview;
 
     private MzSqLiteOpenHelper mzSqLiteOpenHelper;
     private SQLiteDatabase mzdb;
@@ -103,6 +104,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onResume() {
+        if (getIntent().getStringExtra("url") != null) {
+            mz_url = getIntent().getStringExtra("url");
+            /*mz_child_webview[mz_childcurrentinder].loadUrl(mz_url);*/
+            newChildWebView(mz_url);
+        }
         clipUrltip();
         super.onResume();
     }
@@ -162,7 +168,8 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_newtab_textview.setOnClickListener(this);
         mz_closetab_textview = (TextView) this.findViewById(R.id.mzclosetextview);
         mz_closetab_textview.setOnClickListener(this);
-
+        mz_managebookmark_textview = (TextView) this.findViewById(R.id.mzmanagebookmarktextview);
+        mz_managebookmark_textview.setOnClickListener(this);
 
         clipUrltip();
         if (mz_url == null) {
@@ -171,11 +178,12 @@ public class MainActivity extends Activity implements OnClickListener {
         newChildWebView(mz_url);
     }
 
+
     @TargetApi(Build.VERSION_CODES.M)
     private void switchChildWebView(int switchindex) {
         mz_childcurrentinder = switchindex;
         for (int i = 0; i < mz_webviewsum; i++) {
-            if (mz_child_webview[i] != null && i != switchindex) {
+            if (mz_child_webview[i] != null && mz_child_textview[i] != null && i != switchindex) {
                 mz_child_webview[i].setVisibility(View.GONE);
                 mz_child_textview[i].setTextColor(Color.WHITE);
             }
@@ -478,6 +486,13 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == FROMBOOKMARK){
+            newChildWebView(data.getStringExtra("url"));
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (v == mz_imageview) {
             mz_url = mz_edittext.getText().toString();
@@ -502,6 +517,7 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (v == mz_share_imageview) {
             shareapp();
         } else if (v == mz_newtab_textview) {
+            mz_url = this.getResources().getString(R.string.index_site);
             newChildWebView(mz_url);
         } else if (v == mz_closetab_textview) {
             closeChildWebView();
@@ -533,6 +549,11 @@ public class MainActivity extends Activity implements OnClickListener {
                 Toast.makeText(this, "添加收藏", Toast.LENGTH_SHORT).show();
             }
             mz_bookmark_imageview.startAnimation(mz_bookmark_animation);
+        } else if (v == mz_managebookmark_textview) {
+            Intent intent = new Intent(this, SettingActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("page", "bookmarks");
+            startActivityForResult(intent,FROMBOOKMARK);
         } else {
             for (int i = 0; i < mz_webviewsum; i++) {
                 if (mz_child_textview[i] != null && v == mz_child_textview[i]) {

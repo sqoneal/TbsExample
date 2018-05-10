@@ -6,4 +6,6 @@
     <string name="newtab">新建页面</string>
     <string name="closetab">关闭页面</string>
     <string name="managebookmark">管理收藏夹</string>
+    <string name="bookmarks">收藏夹</string>
+    <string name="setting">设置</string>
 </resources>

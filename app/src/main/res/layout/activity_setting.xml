@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context="com.liebao.zzj.tbsexample.SettingActivity">
+
+
+    <LinearLayout
+        android:id="@+id/llayout_setting_left"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="page" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:orientation="vertical">
+
+<!--        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+&lt;!&ndash;        <view
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/black" />&ndash;&gt;-->
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/llayout_setting_right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/llayout_setting_left"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="context" />
+    </LinearLayout>
+
+</LinearLayout>
