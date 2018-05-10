@@ -16,7 +16,7 @@ public class SettingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-       mz_setting_left_llayout = (LinearLayout) this.findViewById(R.id.llayout_setting_left);
+        mz_setting_left_llayout = (LinearLayout) this.findViewById(R.id.llayout_setting_left);
         mz_setting_right_llayout = (LinearLayout) this.findViewById(R.id.llayout_setting_right);
 
         mzfragmentManager = getFragmentManager();
@@ -24,5 +24,10 @@ public class SettingActivity extends Activity {
         FragmentTransaction ft = mzfragmentManager.beginTransaction();
         ft.replace(R.id.llayout_setting_left, mzfragmentleft);
         ft.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

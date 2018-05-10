@@ -28,6 +28,7 @@ public class MzFgBookmark extends Fragment {
     private ArrayList<MzBookmarkBean> mz_data;
     private MzSqLiteOpenHelper mzSqLiteOpenHelper;
     private SQLiteDatabase mzdb;
+    private Cursor cursor;
 
     @Nullable
     @Override
@@ -37,7 +38,7 @@ public class MzFgBookmark extends Fragment {
         mz_data = new ArrayList<>();
         mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication(), "mz.db", null, 1);
         mzdb = mzSqLiteOpenHelper.getReadableDatabase();
-        Cursor cursor = mzdb.query("bookmarks", null, null, null, null, null, null);
+        cursor = mzdb.query("bookmarks", null, null, null, null, null, null);
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             mzBookmarkBean = new MzBookmarkBean(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
             mz_data.add(mzBookmarkBean);
@@ -87,10 +88,14 @@ public class MzFgBookmark extends Fragment {
                 return true;
             }
         });
+        return view;
+    }
 
+    @Override
+    public void onDetach() {
         cursor.close();
         mzdb.close();
         mzSqLiteOpenHelper.close();
-        return view;
+        super.onDetach();
     }
 }
