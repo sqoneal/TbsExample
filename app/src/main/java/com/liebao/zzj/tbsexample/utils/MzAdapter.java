@@ -1,6 +1,6 @@
 package com.liebao.zzj.tbsexample.utils;
 
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 public class MzAdapter extends BaseAdapter {
     private LayoutInflater mz_layoutinflater;
     private ArrayList<MzBookmarkBean> mz_data;
-    //private Context mz_context;
+    private Activity mz_activity;
 
-    public MzAdapter(Context context, ArrayList<MzBookmarkBean> lData) {
-        mz_layoutinflater = LayoutInflater.from(context);
+    public MzAdapter(Activity activity, ArrayList<MzBookmarkBean> lData) {
+        mz_layoutinflater = LayoutInflater.from(activity);
         this.mz_data = lData;
-        //this.mz_context = context;
+        this.mz_activity = activity;
     }
 
     @Override
@@ -53,19 +53,11 @@ public class MzAdapter extends BaseAdapter {
         } else {
             vh = (ViewHolder) convertView.getTag();
         }
-        vh.mz_imageview.setImageResource(R.mipmap.ic_launcher);
+        MzOkhttpHelper mzOkhttpHelper = new MzOkhttpHelper(mz_activity);
+        mzOkhttpHelper.setImageViewBitmapByUrl(mzOkhttpHelper.ParseUrltofavicon(mz_data.get(position).getUrl()), vh.mz_imageview);
+        //vh.mz_imageview.setImageResource(R.mipmap.ic_launcher);
         vh.mz_textview.setText(mz_data.get(position).getTitle());
-        /*convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String murl = mz_data.get(position).getUrl();
-                Intent intent = new Intent(mz_context, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("url", murl);
-                mz_context.setResult(MainActivity.FROMBOOKMARK, intent);
-                mz_context.finish();
-            }
-        });*/
+
         return convertView;
     }
 
