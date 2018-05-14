@@ -78,7 +78,7 @@ public class MzFgBookmark extends Fragment {
                                 String sqlstr = "delete from bookmarks where id = '" + mz_data.get(position).getId() + "'";
                                 mzdb.execSQL(sqlstr);
                                 mz_data.remove(position);
-                                mz_listview.setAdapter(mzAdapter);
+                                mz_listview.deferNotifyDataSetChanged();
                                 mz_listview.setSelection(position);
                                 Toast.makeText(getActivity(), "已删除收藏", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();

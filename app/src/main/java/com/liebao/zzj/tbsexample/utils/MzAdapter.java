@@ -18,11 +18,13 @@ public class MzAdapter extends BaseAdapter {
     private LayoutInflater mz_layoutinflater;
     private ArrayList<MzBookmarkBean> mz_data;
     private Activity mz_activity;
+    MzOkhttpHelper mzOkhttpHelper;
 
     public MzAdapter(Activity activity, ArrayList<MzBookmarkBean> lData) {
         mz_layoutinflater = LayoutInflater.from(activity);
         this.mz_data = lData;
         this.mz_activity = activity;
+        mzOkhttpHelper = new MzOkhttpHelper(mz_activity);
     }
 
     @Override
@@ -42,23 +44,24 @@ public class MzAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        convertView = mz_layoutinflater.inflate(R.layout.listlayout, null);
-        ViewHolder vh = null;
-        if (vh == null) {
+        View rowView = convertView;
+        ViewHolder vh;
+        if (rowView == null) {
+            rowView = mz_layoutinflater.inflate(R.layout.listlayout, null);
             vh = new ViewHolder();
-            vh.mz_imageview = (ImageView) convertView.findViewById(R.id.fg_icon_imageview);
-            vh.mz_textview = (TextView) convertView.findViewById(R.id.fg_title_textview);
-            vh.mz_textview.setTextColor(Color.BLACK);
-            convertView.setTag(vh);
+            rowView.setTag(vh);
         } else {
-            vh = (ViewHolder) convertView.getTag();
+            vh = (ViewHolder) rowView.getTag();
         }
-        MzOkhttpHelper mzOkhttpHelper = new MzOkhttpHelper(mz_activity);
-        mzOkhttpHelper.setImageViewBitmapByUrl(mzOkhttpHelper.ParseUrltofavicon(mz_data.get(position).getUrl()), vh.mz_imageview);
-        //vh.mz_imageview.setImageResource(R.mipmap.ic_launcher);
-        vh.mz_textview.setText(mz_data.get(position).getTitle());
 
-        return convertView;
+        vh = new ViewHolder();
+        vh.mz_imageview = (ImageView) rowView.findViewById(R.id.fg_icon_imageview);
+        vh.mz_textview = (TextView) rowView.findViewById(R.id.fg_title_textview);
+        vh.mz_textview.setTextColor(Color.BLACK);
+        vh.mz_textview.setText(mz_data.get(position).getTitle());
+        mzOkhttpHelper.setImageViewBitmapByUrl(mzOkhttpHelper.ParseUrltofavicon(mz_data.get(position).getUrl()), vh.mz_imageview);
+
+        return rowView;
     }
 
     public final class ViewHolder {
