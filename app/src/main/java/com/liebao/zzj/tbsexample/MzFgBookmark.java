@@ -16,13 +16,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.liebao.zzj.tbsexample.bean.MzBookmarkBean;
-import com.liebao.zzj.tbsexample.utils.MzAdapter;
+import com.liebao.zzj.tbsexample.utils.MzDataAdapter;
 import com.liebao.zzj.tbsexample.utils.MzSqLiteOpenHelper;
 
 import java.util.ArrayList;
 
 public class MzFgBookmark extends Fragment {
-    private MzAdapter mzAdapter;
+    //private MzAdapter mzAdapter;
+    private MzDataAdapter mzAdapter;
     private ListView mz_listview;
     MzBookmarkBean mzBookmarkBean;
     private ArrayList<MzBookmarkBean> mz_data;
@@ -43,7 +44,8 @@ public class MzFgBookmark extends Fragment {
             mzBookmarkBean = new MzBookmarkBean(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
             mz_data.add(mzBookmarkBean);
         }
-        mzAdapter = new MzAdapter(getActivity(), mz_data);
+        //mzAdapter = new MzAdapter(getActivity(), mz_data);
+        mzAdapter = new MzDataAdapter(getActivity(), mz_data);
         mz_listview.setAdapter(mzAdapter);
 
         mz_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -78,7 +80,7 @@ public class MzFgBookmark extends Fragment {
                                 String sqlstr = "delete from bookmarks where id = '" + mz_data.get(position).getId() + "'";
                                 mzdb.execSQL(sqlstr);
                                 mz_data.remove(position);
-                                mz_listview.deferNotifyDataSetChanged();
+                                mzAdapter.notifyDataSetChanged();
                                 mz_listview.setSelection(position);
                                 Toast.makeText(getActivity(), "已删除收藏", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
