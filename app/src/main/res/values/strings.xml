@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TbsExample</string>
+    <string name="app_name">大Z浏览器</string>
     <string name="index_site">http://nba.qq.com</string>
     <string name="clickgo">GO</string>
     <string name="skip">跳过</string>
@@ -8,4 +8,5 @@
     <string name="managebookmark">管理收藏夹</string>
     <string name="bookmarks">收藏夹</string>
     <string name="setting">设置</string>
+    <string name="about">关于</string>
 </resources>
