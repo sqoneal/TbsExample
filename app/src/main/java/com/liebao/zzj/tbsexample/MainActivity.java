@@ -306,7 +306,6 @@ public class MainActivity extends Activity implements OnClickListener {
             // 进入全屏的时候
             @Override
             public void onShowCustomView(View view, IX5WebChromeClient.CustomViewCallback callback) {
-                Log.e("show", "aaaaaaaaa");
                 // 赋值给callback
                 customViewCallback = callback;
                 // 设置webView隐藏
@@ -458,7 +457,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         "javascript:" + "var r=confirm('下载链接：" + s + "\n文件大小" + (l / 1024 / 1024) + "MB');" +
                                 "if (r==true)" +
                                 "{" +
-                                    "mz_javascript.showlog('"+s+"')"+
+                                "mz_javascript.showlog('" + s + "')" +
                                 "}" +
                                 "else" +
                                 "{" +
@@ -470,7 +469,7 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         });
 
-        mz_child_webview[mz_childcurrentinder].addJavascriptInterface(new MzJsInterface(),"mz_javascript");
+        mz_child_webview[mz_childcurrentinder].addJavascriptInterface(new MzJsInterface(), "mz_javascript");
         return true;
     }
 
@@ -675,9 +674,9 @@ public class MainActivity extends Activity implements OnClickListener {
     @SuppressWarnings("unused")
     private final class MzJsInterface {
         @JavascriptInterface
-        public void showlog(String s){
-            Log.e("test",s);
-            Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+        public void showlog(String s) {
+            Log.e("test", s);
+            Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
         }
     }
 }
