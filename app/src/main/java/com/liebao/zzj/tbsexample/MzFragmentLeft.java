@@ -41,12 +41,12 @@ public class MzFragmentLeft extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == mz_fg_left_bookmark_textview) {
             drumpRightPage(TOBOOKMARK);
-        }else if(v == mz_fg_left_about_textview){
+        } else if (v == mz_fg_left_about_textview) {
             drumpRightPage(TOABOUT);
         }
     }
 
-    private void drumpRightPage(int key){
+    private void drumpRightPage(int key) {
         fragmentTransaction = fragmentManager.beginTransaction();
         mzFragmentRight = new MzFragmentRight();
         Bundle bd = new Bundle();

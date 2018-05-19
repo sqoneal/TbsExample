@@ -24,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.webkit.JavascriptInterface;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,6 +39,7 @@ import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.CookieSyncManager;
+import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
@@ -447,6 +449,28 @@ public class MainActivity extends Activity implements OnClickListener {
                 }
             }
         });
+
+        mz_child_webview[mz_childcurrentinder].setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+                Log.e("test", "onDownloadStart" + "s:" + s + ",s1:" + s1 + ",s2:" + s2 + ",s3:" + s3 + ",l:" + l);
+                mz_child_webview[mz_childcurrentinder].loadUrl(
+                        "javascript:" + "var r=confirm('下载链接：" + s + "\n文件大小" + (l / 1024 / 1024) + "MB');" +
+                                "if (r==true)" +
+                                "{" +
+                                    "mz_javascript.showlog('"+s+"')"+
+                                "}" +
+                                "else" +
+                                "{" +
+                                "    x=2" +
+                                "} "
+                );
+
+                Log.e("test", "okokok");
+            }
+        });
+
+        mz_child_webview[mz_childcurrentinder].addJavascriptInterface(new MzJsInterface(),"mz_javascript");
         return true;
     }
 
@@ -487,7 +511,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == FROMBOOKMARK){
+        if (resultCode == FROMBOOKMARK) {
             newChildWebView(data.getStringExtra("url"));
         }
     }
@@ -553,7 +577,7 @@ public class MainActivity extends Activity implements OnClickListener {
             Intent intent = new Intent(this, SettingActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.putExtra("page", "bookmarks");
-            startActivityForResult(intent,FROMBOOKMARK);
+            startActivityForResult(intent, FROMBOOKMARK);
         } else {
             for (int i = 0; i < mz_webviewsum; i++) {
                 if (mz_child_textview[i] != null && v == mz_child_textview[i]) {
@@ -645,6 +669,15 @@ public class MainActivity extends Activity implements OnClickListener {
                 dialog.show();
 
             }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private final class MzJsInterface {
+        @JavascriptInterface
+        public void showlog(String s){
+            Log.e("test",s);
+            Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
         }
     }
 }
