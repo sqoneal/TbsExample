@@ -18,17 +18,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.liebao.zzj.tbsexample.bean.MzBookmarkBean;
+import com.liebao.zzj.tbsexample.bean.MzDownloadBean;
 import com.liebao.zzj.tbsexample.utils.MzDataAdapter;
+import com.liebao.zzj.tbsexample.utils.MzDownloadAdapter;
 import com.liebao.zzj.tbsexample.utils.MzSqLiteOpenHelper;
 
 import java.util.ArrayList;
 
 public class MzFragmentRight extends Fragment {
-    //private MzAdapter mzAdapter;
     private MzDataAdapter mzAdapter;
+    private MzDownloadAdapter mzDownloadAdapter;
     private ListView mz_listview;
     MzBookmarkBean mzBookmarkBean;
     private ArrayList<MzBookmarkBean> mz_data;
+    MzDownloadBean mzDownloadBean;
+    private ArrayList<MzDownloadBean> mz_downloaddata;
     private MzSqLiteOpenHelper mzSqLiteOpenHelper;
     private SQLiteDatabase mzdb;
     private Cursor cursor;
@@ -50,7 +54,6 @@ public class MzFragmentRight extends Fragment {
                     mzBookmarkBean = new MzBookmarkBean(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
                     mz_data.add(mzBookmarkBean);
                 }
-                //mzAdapter = new MzAdapter(getActivity(), mz_data);
                 mzAdapter = new MzDataAdapter(getActivity(), mz_data);
                 mz_listview.setAdapter(mzAdapter);
 
@@ -108,6 +111,21 @@ public class MzFragmentRight extends Fragment {
                     e.printStackTrace();
                 }
                 return aboutview;
+            case MzFragmentLeft.TODOWNLOAD:
+                View downloadview = inflater.inflate(R.layout.fg_download, container, false);
+                ListView mz_downing_listview = (ListView) downloadview.findViewById(R.id.mzdowninglv);
+                mz_downloaddata = new ArrayList<>();
+                mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication(), "mz.db", null, 1);
+                mzdb = mzSqLiteOpenHelper.getReadableDatabase();
+                cursor = mzdb.query("downloads", null, null, null, null, null, null);
+                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    mzDownloadBean = new MzDownloadBean(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4));
+                    mz_downloaddata.add(mzDownloadBean);
+                }
+                mzDownloadAdapter = new MzDownloadAdapter(getActivity(), mz_downloaddata);
+                mz_downing_listview.setAdapter(mzDownloadAdapter);
+                ListView mz_downed_listview = (ListView) downloadview.findViewById(R.id.mzdownedlv);
+                return downloadview;
         }
         return null;
     }

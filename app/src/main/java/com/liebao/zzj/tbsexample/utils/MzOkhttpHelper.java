@@ -1,13 +1,9 @@
 package com.liebao.zzj.tbsexample.utils;
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.util.Log;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -16,13 +12,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MzOkhttpHelper {
-    private Activity mz_activity;
 
-    public MzOkhttpHelper(Activity activity) {
-        this.mz_activity = activity;
-    }
-
-    boolean setImageViewBitmapByUrl(String url, final ImageView imageView) {
+    boolean DownloadFileByUrl(String url) {
         if (url == null) {
             return false;
         }
@@ -32,46 +23,15 @@ public class MzOkhttpHelper {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                ToastUtil.showToast(mz_activity, "下载图片失败");
+                Log.e("test", "download failed");
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                InputStream inputStream = response.body().byteStream();
-                final Bitmap mz_bitmap = BitmapFactory.decodeStream(inputStream);
-                mz_activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageView.setImageBitmap(mz_bitmap);
-                    }
-                });
+                FileInputStream fileInputStream = (FileInputStream) response.body().byteStream();
+
             }
         });
         return true;
-    }
-
-    public static class ToastUtil {
-        public static void showToast(final Activity activity, final String message) {
-            if ("main".equals(Thread.currentThread().getName())) {
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-            } else {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        }
-    }
-
-    public String ParseUrltofavicon(String url) {
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            int index = url.indexOf("/", 9);
-            url = url.substring(0, index);
-            url = url + "/favicon.ico";
-            return url;
-        }
-        return null;
     }
 }

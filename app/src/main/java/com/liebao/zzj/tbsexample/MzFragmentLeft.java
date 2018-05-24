@@ -11,10 +11,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class MzFragmentLeft extends Fragment implements View.OnClickListener {
-    public static final int TOBOOKMARK = 0X001;
-    public static final int TOABOUT = 0X003;
+    public static final int TOBOOKMARK = 0X0011;
+    public static final int TODOWNLOAD = 0X0012;
+    public static final int TOABOUT = 0X0013;
     private TextView mz_fg_left_bookmark_textview;
     private TextView mz_fg_left_about_textview;
+    private TextView mz_fg_left_download_textview;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     private MzFragmentRight mzFragmentRight;
@@ -31,9 +33,16 @@ public class MzFragmentLeft extends Fragment implements View.OnClickListener {
         mz_fg_left_bookmark_textview.setOnClickListener(this);
         mz_fg_left_about_textview = (TextView) view.findViewById(R.id.fg_about_textview);
         mz_fg_left_about_textview.setOnClickListener(this);
+        mz_fg_left_download_textview = (TextView) view.findViewById(R.id.fg_download_textview);
+        mz_fg_left_download_textview.setOnClickListener(this);
 
-        //mz_fg_left_about_textview.performClick();
-        mz_fg_left_bookmark_textview.performClick();
+        int key = this.getActivity().getIntent().getIntExtra("page", 0);
+        if (key == TOBOOKMARK) {
+            mz_fg_left_bookmark_textview.performClick();
+        } else if (key == TODOWNLOAD) {
+            mz_fg_left_download_textview.performClick();
+        }
+
         return view;
     }
 
@@ -43,6 +52,8 @@ public class MzFragmentLeft extends Fragment implements View.OnClickListener {
             drumpRightPage(TOBOOKMARK);
         } else if (v == mz_fg_left_about_textview) {
             drumpRightPage(TOABOUT);
+        } else if (v == mz_fg_left_download_textview) {
+            drumpRightPage(TODOWNLOAD);
         }
     }
 

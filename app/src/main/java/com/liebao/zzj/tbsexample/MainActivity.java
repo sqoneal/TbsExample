@@ -74,7 +74,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private String mz_child_title[] = new String[mz_webviewsum];
     private String mz_child_url[] = new String[mz_webviewsum];
     private TextView mz_child_textview[] = new TextView[mz_webviewsum];
-    private TextView mz_newtab_textview, mz_managebookmark_textview, mz_closetab_textview;
+    private TextView mz_newtab_textview, mz_managebookmark_textview, mz_closetab_textview, mz_managedownload_textview;
 
     private MzSqLiteOpenHelper mzSqLiteOpenHelper;
     private SQLiteDatabase mzdb;
@@ -172,6 +172,8 @@ public class MainActivity extends Activity implements OnClickListener {
         mz_closetab_textview.setOnClickListener(this);
         mz_managebookmark_textview = (TextView) this.findViewById(R.id.mzmanagebookmarktextview);
         mz_managebookmark_textview.setOnClickListener(this);
+        mz_managedownload_textview = (TextView) this.findViewById(R.id.mzmanagedownloadtextview);
+        mz_managedownload_textview.setOnClickListener(this);
 
         clipUrltip();
         if (mz_url == null) {
@@ -457,12 +459,8 @@ public class MainActivity extends Activity implements OnClickListener {
                         "javascript:" + "var r=confirm('下载链接：" + s + "\n文件大小" + (l / 1024 / 1024) + "MB');" +
                                 "if (r==true)" +
                                 "{" +
-                                "mz_javascript.showlog('" + s + "')" +
-                                "}" +
-                                "else" +
-                                "{" +
-                                "    x=2" +
-                                "} "
+                                "mz_javascript.AddToDownload('" + s + "','" + l + "')" +
+                                "}"
                 );
 
                 Log.e("test", "okokok");
@@ -575,8 +573,13 @@ public class MainActivity extends Activity implements OnClickListener {
         } else if (v == mz_managebookmark_textview) {
             Intent intent = new Intent(this, SettingActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("page", "bookmarks");
+            intent.putExtra("page", MzFragmentLeft.TOBOOKMARK);
             startActivityForResult(intent, FROMBOOKMARK);
+        } else if (v == mz_managedownload_textview) {
+            Intent intent = new Intent(this, SettingActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("page", MzFragmentLeft.TODOWNLOAD);
+            startActivity(intent);
         } else {
             for (int i = 0; i < mz_webviewsum; i++) {
                 if (mz_child_textview[i] != null && v == mz_child_textview[i]) {
@@ -674,9 +677,12 @@ public class MainActivity extends Activity implements OnClickListener {
     @SuppressWarnings("unused")
     private final class MzJsInterface {
         @JavascriptInterface
-        public void showlog(String s) {
-            Log.e("test", s);
-            Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+        public void AddToDownload(String url, String size) {
+            int index = url.lastIndexOf("/");
+            String fname = url.substring(index + 1, url.length());
+            int fsize = Integer.parseInt(size);
+            mzdb = mzSqLiteOpenHelper.getWritableDatabase();
+            mzdb.execSQL("insert into downloads(fname,url,fsize,status) values('" + fname + "','" + url + "','" + size + "','" + MzSqLiteOpenHelper.DOWNLOADSTATUS_NOFINISH + "')");
         }
     }
 }

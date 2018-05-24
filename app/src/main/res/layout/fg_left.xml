@@ -7,29 +7,37 @@
 
     <TextView
         android:id="@+id/fg_bookmark_textview"
-        android:text="@string/bookmarks"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="@string/bookmarks" />
+
     <View
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/black"/>
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@android:color/black" />
+
     <TextView
-        android:id="@+id/fg_setting_textview"
-        android:text="@string/setting"
+        android:id="@+id/fg_download_textview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="@string/download" />
+
     <View
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/black"/>
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@android:color/black" />
+
     <TextView
         android:id="@+id/fg_about_textview"
-        android:text="@string/about"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="@string/about" />
+
 </LinearLayout>
