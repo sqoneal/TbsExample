@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class MzSqLiteOpenHelper extends SQLiteOpenHelper {
-    public final static int MZDBVERSION = 2;
+    public final static int MZDBVERSION = 3;
     public final static int DOWNLOADSTATUS_NOFINISH = 1;
     public final static int DOWNLOADSTATUS_FINISH = 2;
 
@@ -17,12 +17,16 @@ public class MzSqLiteOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE bookmarks(id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(100),url VARCHAR(100))");
         db.execSQL("CREATE TABLE downloads(id INTEGER PRIMARY KEY AUTOINCREMENT,fname VARCHAR(100),url VARCHAR(300),fsize int(10),status int(3))");
+        db.execSQL("CREATE TABLE threadinfo(id INTEGER PRIMARY KEY thread_id int(3),url VARCHAR(300),startpoint int(10),endpoint int(10),finished int(3))");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1){
+        if (oldVersion == 1) {
             db.execSQL("CREATE TABLE downloads(id INTEGER PRIMARY KEY AUTOINCREMENT,fname VARCHAR(100),url VARCHAR(300),fsize int(10),status int(3))");
+            db.execSQL("CREATE TABLE threadinfo(id INTEGER PRIMARY KEY thread_id int(3),url VARCHAR(300),startpoint int(10),endpoint int(10),finished int(3))");
+        }else if(oldVersion == 2){
+            db.execSQL("CREATE TABLE threadinfo(id INTEGER PRIMARY KEY thread_id int(3),url VARCHAR(300),startpoint int(10),endpoint int(10),finished int(3))");
         }
     }
 }

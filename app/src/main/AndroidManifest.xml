@@ -51,7 +51,12 @@
         </activity>
         <activity
             android:name=".SettingActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"></activity>
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
+        <service
+            android:name=".services.MzDownloadService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

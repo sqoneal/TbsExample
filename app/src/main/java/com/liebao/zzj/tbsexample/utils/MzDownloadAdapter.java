@@ -3,6 +3,7 @@ package com.liebao.zzj.tbsexample.utils;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -21,20 +22,25 @@ import android.widget.Toast;
 
 import com.liebao.zzj.tbsexample.R;
 import com.liebao.zzj.tbsexample.bean.MzDownloadBean;
+import com.liebao.zzj.tbsexample.services.MzDownloadService;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import static java.lang.Integer.parseInt;
 
 public class MzDownloadAdapter extends BaseAdapter {
     ArrayList<MzDownloadBean> mz_data;
     Context mz_context;
     final DownloadTask[] downloadTask;
     public final static String download_path = Environment.getExternalStorageDirectory().getPath() + "/download/";
+
     public MzDownloadAdapter(Context context, ArrayList<MzDownloadBean> data) {
         this.mz_data = data;
         this.mz_context = context;
@@ -79,22 +85,29 @@ public class MzDownloadAdapter extends BaseAdapter {
         vh.mz_start_imageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (downloadTask[position] == null) {
+                /*if (downloadTask[position] == null) {
                     downloadTask[position] = new DownloadTask(vh, position);
                     downloadTask[position].execute(mz_data.get(position).getUrl(), mz_data.get(position).getFname(), String.valueOf(mz_data.get(position).getFsize()));
-                }
+                }*/
+
                 vh.mz_start_imageview.setImageResource(R.drawable.pause);
+
+                MzDownloadBean mzDownloadBean = mz_data.get(position);
+                Intent intent = new Intent(mz_context, MzDownloadService.class);
+                intent.setAction(MzDownloadService.ACTION_START);
+                intent.putExtra("downloadbean", (Serializable) mzDownloadBean);
+                mz_context.startService(intent);
             }
         });
 
         return view;
     }
 
-    public final class ViewHolder {
-        ImageView mz_start_imageview;
-        TextView mz_fname_textview;
-        TextView mz_fsize_textview;
-        ProgressBar mz_down_pg;
+    public class ViewHolder {
+        public ImageView mz_start_imageview;
+        public TextView mz_fname_textview;
+        public TextView mz_fsize_textview;
+        public ProgressBar mz_down_pg;
     }
 
     /*“启动任务执行的输入参数分别为：url,文件名,文件大小”、“后台任务执行的进度”、“后台计算结果的类型”*/
@@ -116,7 +129,7 @@ public class MzDownloadAdapter extends BaseAdapter {
                 mz_db.close();
                 mzSqLiteOpenHelper.close();
                 Toast.makeText(mz_context, "完成一项下载", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 Toast.makeText(mz_context, "失败一项下载", Toast.LENGTH_SHORT).show();
             }
         }
@@ -143,14 +156,14 @@ public class MzDownloadAdapter extends BaseAdapter {
         protected Boolean doInBackground(final String... params) {
             boolean result;
             fname = params[1];
-            if(ContextCompat.checkSelfPermission(mz_context, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(mz_context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 //第一请求权限被取消显示的判断，一般可以不写
                 if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mz_context,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    Log.i("readTosdCard","我们需要这个权限给你提供存储服务");
-                }else {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Log.i("readTosdCard", "我们需要这个权限给你提供存储服务");
+                } else {
                     //2、申请权限: 参数二：权限的数组；参数三：请求码
-                    ActivityCompat.requestPermissions((Activity) mz_context,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                    ActivityCompat.requestPermissions((Activity) mz_context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 }
             }
             File mzfile = new File(download_path + fname);
@@ -171,7 +184,7 @@ public class MzDownloadAdapter extends BaseAdapter {
                 byte[] buf = new byte[1024];
                 int count = 0;
                 int length;
-                filesize = Integer.parseInt(params[2]);
+                filesize = parseInt(params[2]);
                 while ((length = inputStream.read(buf)) != -1) {
                     fileOutputStream.write(buf, 0, length);
                     count += length;
@@ -183,8 +196,8 @@ public class MzDownloadAdapter extends BaseAdapter {
             } catch (Exception e) {
                 result = false;
                 e.printStackTrace();
-            }finally {
-                if (conn != null){
+            } finally {
+                if (conn != null) {
                     conn.disconnect();
                 }
             }
