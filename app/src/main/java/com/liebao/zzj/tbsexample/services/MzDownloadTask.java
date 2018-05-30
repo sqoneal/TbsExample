@@ -109,6 +109,7 @@ public class MzDownloadTask {
                         if ((System.currentTimeMillis() - time) > 500) {
                             time = System.currentTimeMillis();
                             intent.putExtra("finished", mfinished * 100 / mzDownloadBean.getFsize());
+                            intent.putExtra("downloadbeanid", mzDownloadBean.getId());
                             mcontext.sendBroadcast(intent);
                         }
                         //暂停下载

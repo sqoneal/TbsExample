@@ -95,7 +95,7 @@ public class MzDownloadAdapter extends BaseAdapter {
                     downloadTask[position] = new DownloadTask(vh, position);
                     downloadTask[position].execute(mz_data.get(position).getUrl(), mz_data.get(position).getFname(), String.valueOf(mz_data.get(position).getFsize()));
                 }*/
-                if (!isdownload[position]){
+                if (!isdownload[position]) {
                     vh.mz_start_imageview.setImageResource(R.drawable.pause);
                     MzDownloadBean mzDownloadBean = mz_data.get(position);
                     Intent intent = new Intent(mz_context, MzDownloadService.class);
@@ -103,7 +103,7 @@ public class MzDownloadAdapter extends BaseAdapter {
                     intent.putExtra("downloadbean", (Serializable) mzDownloadBean);
                     mz_context.startService(intent);
                     isdownload[position] = true;
-                }else {
+                } else {
                     vh.mz_start_imageview.setImageResource(R.drawable.play);
                     MzDownloadBean mzDownloadBean = mz_data.get(position);
                     Intent intent = new Intent(mz_context, MzDownloadService.class);
@@ -115,28 +115,29 @@ public class MzDownloadAdapter extends BaseAdapter {
             }
         });
 
-        mzBroadcastReceiver broadcastReceiver = new mzBroadcastReceiver(vh);
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (MzDownloadService.ACTION_UPDATE.equals(intent.getAction())) {
+                    if (mz_data.get(position).getId() == intent.getIntExtra("downloadbeanid", -1)) {
+                        int finished = intent.getIntExtra("finished", 0);
+
+                        vh.mz_down_pg.setProgress(finished);
+                        double d1 = new BigDecimal(((float) mz_data.get(position).getFsize() / (float) 1048576)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        double d2 = new BigDecimal((finished * d1) / (float) 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        vh.mz_fsize_textview.setText(d2 + "MB/" + d1 + "MB");
+
+                        if (mz_data.get(position).getFsize() == finished){
+                            vh.mz_start_imageview.setImageResource(R.drawable.play);
+                        }
+                    }
+
+                }
+            }
+        };
         mz_context.registerReceiver(broadcastReceiver, new IntentFilter(MzDownloadService.ACTION_UPDATE));
 
         return view;
-    }
-
-    public class mzBroadcastReceiver extends BroadcastReceiver{
-        private ViewHolder vh = null;
-        public mzBroadcastReceiver() {
-        }
-
-        public mzBroadcastReceiver(ViewHolder vh) {
-            this.vh = vh;
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(MzDownloadService.ACTION_UPDATE.equals(intent.getAction())){
-                Log.e("test",vh.toString());
-                vh.mz_down_pg.setProgress(intent.getIntExtra("finished", 0));
-            }
-        }
     }
 
     public class ViewHolder {
