@@ -14,7 +14,7 @@ public class ThreadDaoImpl implements ThreadDao {
     SQLiteDatabase db = null;
 
     public ThreadDaoImpl(Context context) {
-        mzSqLiteOpenHelper = new MzSqLiteOpenHelper(context, "mz.db", null, 3);
+        mzSqLiteOpenHelper = new MzSqLiteOpenHelper(context);
     }
 
     @Override
@@ -36,23 +36,25 @@ public class ThreadDaoImpl implements ThreadDao {
     @Override
     public void updateThread(String url, int thread_id, int finished) {
         db = mzSqLiteOpenHelper.getWritableDatabase();
-        db.execSQL("update threadinfo where id=? and url=? set finished=?", new Object[]{thread_id, url, finished});
+        db.execSQL("update threadinfo set finished=?  where id=? and url=? ", new Object[]{finished, thread_id, url});
         db.close();
     }
 
     @Override
     public ArrayList<MzThreadinfoBean> getThreads(String url) {
-        ArrayList<MzThreadinfoBean> data = null;
+        ArrayList<MzThreadinfoBean> data = new ArrayList<>();
         db = mzSqLiteOpenHelper.getReadableDatabase();
-        Cursor cursor = db.query("threadinfo", null, "url='" + url + "'", null, null, null, null);
+        //Cursor cursor = db.query("threadinfo", null, "url='" + url + "'", null, null, null, null);
+        Cursor cursor = db.rawQuery("select * from threadinfo where url = ?",new String[]{url});
         if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
+            do {
                 MzThreadinfoBean mzThreadinfoBean = new MzThreadinfoBean(cursor.getInt(0), cursor.getString(1),
                         cursor.getInt(2), cursor.getInt(3), cursor.getInt(4));
                 data.add(mzThreadinfoBean);
-            }
+            }while (cursor.moveToNext());
         }
         cursor.close();
+        db.close();
         return data;
     }
 
@@ -67,6 +69,7 @@ public class ThreadDaoImpl implements ThreadDao {
             b = false;
         }
         cursor.close();
+        db.close();
         return b;
     }
 }

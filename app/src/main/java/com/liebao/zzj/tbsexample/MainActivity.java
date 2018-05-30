@@ -138,7 +138,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 Log.e("@@", "加载内核是否成功:" + b);
             }
         });
-        mzSqLiteOpenHelper = new MzSqLiteOpenHelper(this, "mz.db", null, 1);
+        mzSqLiteOpenHelper = new MzSqLiteOpenHelper(this);
 
         mz_imageview = (ImageView) this.findViewById(R.id.mzImageView);
         mz_edittext = (EditText) this.findViewById(R.id.mzEditText);

@@ -47,7 +47,7 @@ public class MzFragmentRight extends Fragment {
                 View bookmarkview = inflater.inflate(R.layout.fg_bookmark, container, false);
                 mz_listview = (ListView) bookmarkview.findViewById(R.id.mzfgbookmarklistview);
                 mz_data = new ArrayList<>();
-                mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication(), "mz.db", null, 1);
+                mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication());
                 mzdb = mzSqLiteOpenHelper.getReadableDatabase();
                 cursor = mzdb.query("bookmarks", null, null, null, null, null, null);
                 for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -115,7 +115,7 @@ public class MzFragmentRight extends Fragment {
                 View downloadview = inflater.inflate(R.layout.fg_download, container, false);
                 ListView mz_downing_listview = (ListView) downloadview.findViewById(R.id.mzdowninglv);
                 mz_downloaddata = new ArrayList<>();
-                mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication(), "mz.db", null, 1);
+                mzSqLiteOpenHelper = new MzSqLiteOpenHelper(getActivity().getApplication());
                 mzdb = mzSqLiteOpenHelper.getReadableDatabase();
                 cursor = mzdb.query("downloads", null, null, null, null, null, null);
                 for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {

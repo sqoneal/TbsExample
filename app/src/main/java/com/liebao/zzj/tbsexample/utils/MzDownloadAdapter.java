@@ -2,8 +2,10 @@ package com.liebao.zzj.tbsexample.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -38,13 +40,15 @@ import static java.lang.Integer.parseInt;
 public class MzDownloadAdapter extends BaseAdapter {
     ArrayList<MzDownloadBean> mz_data;
     Context mz_context;
-    final DownloadTask[] downloadTask;
+    //final DownloadTask[] downloadTask;
     public final static String download_path = Environment.getExternalStorageDirectory().getPath() + "/download/";
+    final boolean[] isdownload;
 
     public MzDownloadAdapter(Context context, ArrayList<MzDownloadBean> data) {
         this.mz_data = data;
         this.mz_context = context;
-        downloadTask = new DownloadTask[getCount()];
+        //downloadTask = new DownloadTask[getCount()];
+        isdownload = new boolean[getCount()];
     }
 
     @Override
@@ -64,6 +68,7 @@ public class MzDownloadAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+        isdownload[position] = false;
         View view;
         if (convertView == null) {
             view = LayoutInflater.from(mz_context).inflate(R.layout.downlistlayout, null);
@@ -76,6 +81,7 @@ public class MzDownloadAdapter extends BaseAdapter {
         vh.mz_fname_textview = (TextView) view.findViewById(R.id.mzfnametextview);
         vh.mz_fsize_textview = (TextView) view.findViewById(R.id.mzfsizetextview);
         vh.mz_down_pg = (ProgressBar) view.findViewById(R.id.mzdlprogressBar);
+        vh.mz_down_pg.setMax(100);
 
         vh.mz_fname_textview.setText(mz_data.get(position).getFname());
 
@@ -89,18 +95,48 @@ public class MzDownloadAdapter extends BaseAdapter {
                     downloadTask[position] = new DownloadTask(vh, position);
                     downloadTask[position].execute(mz_data.get(position).getUrl(), mz_data.get(position).getFname(), String.valueOf(mz_data.get(position).getFsize()));
                 }*/
-
-                vh.mz_start_imageview.setImageResource(R.drawable.pause);
-
-                MzDownloadBean mzDownloadBean = mz_data.get(position);
-                Intent intent = new Intent(mz_context, MzDownloadService.class);
-                intent.setAction(MzDownloadService.ACTION_START);
-                intent.putExtra("downloadbean", (Serializable) mzDownloadBean);
-                mz_context.startService(intent);
+                if (!isdownload[position]){
+                    vh.mz_start_imageview.setImageResource(R.drawable.pause);
+                    MzDownloadBean mzDownloadBean = mz_data.get(position);
+                    Intent intent = new Intent(mz_context, MzDownloadService.class);
+                    intent.setAction(MzDownloadService.ACTION_START);
+                    intent.putExtra("downloadbean", (Serializable) mzDownloadBean);
+                    mz_context.startService(intent);
+                    isdownload[position] = true;
+                }else {
+                    vh.mz_start_imageview.setImageResource(R.drawable.play);
+                    MzDownloadBean mzDownloadBean = mz_data.get(position);
+                    Intent intent = new Intent(mz_context, MzDownloadService.class);
+                    intent.setAction(MzDownloadService.ACTION_STOP);
+                    intent.putExtra("downloadbean", (Serializable) mzDownloadBean);
+                    mz_context.startService(intent);
+                    isdownload[position] = false;
+                }
             }
         });
 
+        mzBroadcastReceiver broadcastReceiver = new mzBroadcastReceiver(vh);
+        mz_context.registerReceiver(broadcastReceiver, new IntentFilter(MzDownloadService.ACTION_UPDATE));
+
         return view;
+    }
+
+    public class mzBroadcastReceiver extends BroadcastReceiver{
+        private ViewHolder vh = null;
+        public mzBroadcastReceiver() {
+        }
+
+        public mzBroadcastReceiver(ViewHolder vh) {
+            this.vh = vh;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(MzDownloadService.ACTION_UPDATE.equals(intent.getAction())){
+                Log.e("test",vh.toString());
+                vh.mz_down_pg.setProgress(intent.getIntExtra("finished", 0));
+            }
+        }
     }
 
     public class ViewHolder {
@@ -123,7 +159,7 @@ public class MzDownloadAdapter extends BaseAdapter {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             if (aBoolean) {
-                MzSqLiteOpenHelper mzSqLiteOpenHelper = new MzSqLiteOpenHelper(mz_context, "mz.db", null, MzSqLiteOpenHelper.MZDBVERSION);
+                MzSqLiteOpenHelper mzSqLiteOpenHelper = new MzSqLiteOpenHelper(mz_context);
                 SQLiteDatabase mz_db = mzSqLiteOpenHelper.getWritableDatabase();
                 mz_db.execSQL("update downloads set status='" + MzSqLiteOpenHelper.DOWNLOADSTATUS_FINISH + "' where fname='" + fname + "'");
                 mz_db.close();
