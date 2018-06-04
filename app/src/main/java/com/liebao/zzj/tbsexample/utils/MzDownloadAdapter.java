@@ -127,8 +127,12 @@ public class MzDownloadAdapter extends BaseAdapter {
                         double d2 = new BigDecimal((finished * d1) / (float) 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                         vh.mz_fsize_textview.setText(d2 + "MB/" + d1 + "MB");
 
-                        if (mz_data.get(position).getFsize() == finished){
+                        if (100 == finished) {
                             vh.mz_start_imageview.setImageResource(R.drawable.play);
+                            isdownload[position] = false;
+                        } else {
+                            vh.mz_start_imageview.setImageResource(R.drawable.pause);
+                            isdownload[position] = true;
                         }
                     }
 

@@ -40,10 +40,8 @@ public class MzDownloadTask {
         if (threads.size() == 0) {
             mzThreadinfoBean = new MzThreadinfoBean(mzDownloadBean.getId(), mzDownloadBean.getUrl(), 0, mzDownloadBean.getFsize(), 0);
         } else {
-            Log.e("test", threads.toString());
             mzThreadinfoBean = threads.get(0);
         }
-
         new DownloadThread(mzThreadinfoBean).start();
     }
 
@@ -106,7 +104,7 @@ public class MzDownloadTask {
                         raf.write(buffer, 0, len);
                         mfinished += len;
                         //广播给Activity更新完成进度
-                        if ((System.currentTimeMillis() - time) > 500) {
+                        if ((System.currentTimeMillis() - time) > 500 || mfinished == mzDownloadBean.getFsize()) {
                             time = System.currentTimeMillis();
                             intent.putExtra("finished", mfinished * 100 / mzDownloadBean.getFsize());
                             intent.putExtra("downloadbeanid", mzDownloadBean.getId());

@@ -97,8 +97,8 @@ public class MzDownloadService extends Service {
                 raf = new RandomAccessFile(mfile, "rwd");
                 mzDownloadBean.setFsize(length);
                 raf.setLength(length);
-                mzhandler.obtainMessage(DOWNLOADINIT, mzDownloadBean).sendToTarget();
 
+                mzhandler.obtainMessage(DOWNLOADINIT, mzDownloadBean).sendToTarget();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
